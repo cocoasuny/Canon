@@ -12,6 +12,7 @@
 "canon\stm32f4xx_hal_msp.o"
 "canon\usbd_conf.o"
 "canon\stm32f4xx_it.o"
+"canon\bsp.o"
 "canon\stm32f4xx_hal_rcc.o"
 "canon\stm32f4xx_hal_pcd_ex.o"
 "canon\stm32f4xx_hal_pcd.o"

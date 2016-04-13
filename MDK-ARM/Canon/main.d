@@ -41,4 +41,5 @@ canon\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h
 canon\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_core.h
 canon\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h
 canon\main.o: ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h
+canon\main.o: ../Inc/bsp.h
 canon\main.o: D:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h

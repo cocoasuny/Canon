@@ -34,172 +34,20 @@
 #include "stm32f4xx_hal.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
-#include <stdarg.h>			/* 因为用到了va_start等va_宏，所以必须包含这个文件 */
-#include <stdio.h>			/* 因为用到了printf函数，所以必须包含这个文件 */
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
+#include "bsp.h"
 
 /* Private variables ---------------------------------------------------------*/
 
-/* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
-/* USER CODE END PV */
-
-#ifdef __GNUC__
-/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-   set to 'Yes') calls __io_putchar() */
-#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 
-/* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
-/* USER CODE END PFP */
-
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-
-uint8_t datausb[] = {0x77,0x88,0x99,0x11,0x22,0x33,0x55};
-
-/**
-  * @brief  Configures LED GPIO.
-  * @param  Led: LED to be configured. 
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  */
-void BSP_LED_Init(void)
-{
-  GPIO_InitTypeDef  GPIO_InitStruct;
-  
-  /* Enable the GPIO_LED clock */
-  __GPIOB_CLK_ENABLE();
-
-  /* Configure the GPIO_LED pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-}
-
-/**
-  * @brief  Turns selected LED On.
-  * @param  Led: LED to be set on 
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  */
-void BSP_LED_On(void )
-{
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); 
-}
-
-/**
-  * @brief  Turns selected LED Off. 
-  * @param  Led: LED to be set off
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  */
-void BSP_LED_Off(void)
-{
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); 
-}
-
-/**
-  * @brief  Toggles the selected LED.
-  * @param  Led: LED to be toggled
-  *          This parameter can be one of the following values:
-  *            @arg  LED1
-  *            @arg  LED2
-  *            @arg  LED3
-  *            @arg  LED4
-  */
-void BSP_LED_Toggle(void)
-{
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
-}
-
-/*
-*********************************************************************************************************
-*	函 数 名: UsbSendData
-*	功能说明: 向虚拟串口发送数据
-*	形    参：pBuf, 数据缓冲地址
-*			  nLen, 数据长度，以字节为单位
-*	返 回 值:	=USBD_OK，发送成功
-*				=USBD_BUSY，Tx忙，需要重发
-*				=USBD_FAIL，发送失败
-*	注    释：
-*	作    者：碧云天书
-*********************************************************************************************************
-*/
-uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen)
-{
-	USBD_CDC_SetTxBuffer(&hUsbDeviceFS, (uint8_t*)pBuf, nLen);
-	return USBD_CDC_TransmitPacket(&hUsbDeviceFS);
-}
-
-/*
-*********************************************************************************************************
-*	函 数 名: UsbPrintf
-*	功能说明: 向虚拟串口打印字符串, 接上串口线后，打开PC机的超级终端软件可以观察结果。语法与printf相同。
-*	形    参：lpszFormat, 格式描述字串
-*			  ..., 不定参数
-*	返 回 值: 无
-*	注    释：
-*	作    者：碧云天书
-*********************************************************************************************************
-*/
-#define CMD_BUFFER_LEN 120
-void UsbPrintf(const char* lpszFormat, ...)
-{
-	int nLen;
-	char szBuffer[CMD_BUFFER_LEN+1];
-	va_list args;
-	va_start(args, lpszFormat);
-	nLen = vsnprintf(szBuffer, CMD_BUFFER_LEN+1, lpszFormat, args);
-	UsbSendData((uint8_t*)szBuffer, nLen);
-	va_end(args);
-}
-
-/*******************************************************************************
-* Function Name  : fputc
-* Description    : 映射Printf
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-int fputc(int ch, FILE *f)
-{
-    UsbSendData((uint8_t*)ch, 1);
-    
-    return (ch);
-}
 
 int main(void)
 {
-
-    /* USER CODE BEGIN 1 */
-
-    /* USER CODE END 1 */
-
     /* MCU Configuration----------------------------------------------------------*/
 
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
@@ -214,21 +62,14 @@ int main(void)
 
     HAL_Init();
     BSP_LED_Init();  
+	
     /* Infinite loop */
-    /* USER CODE BEGIN WHILE */
     while (1)
     {
-        /* USER CODE END WHILE */
-
-        /* USER CODE BEGIN 3 */
         HAL_Delay(1000);
         BSP_LED_Toggle();
-        //CDC_Transmit_FS((uint8_t *)&datausb ,7); 
-        UsbPrintf("Hello\r\n");
-        printf("Word\r\n");
+        DLog("Hello Word\r\n");
     }
-    /* USER CODE END 3 */
-
 }
 
 /** System Clock Configuration
