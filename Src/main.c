@@ -32,20 +32,34 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "cmsis_os.h"
+#include "fatfs.h"
 #include "usb_device.h"
-#include "usbd_cdc_if.h"
 #include "bsp.h"
 
-/* Private variables ---------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+SD_HandleTypeDef hsd;
+HAL_SD_CardInfoTypedef SDCardInfo;
+
+/* Private variables ---------------------------------------------------------*/
+xTaskHandle  xHandleLedCtl;
+
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_SDIO_SD_Init(void);
+void LedCtlTask(void *pvParameters);
 
-/* Private function prototypes -----------------------------------------------*/
 
+/*******************************************************************************
+* Function Name  : main函数
+* Description    : main函数 
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
 int main(void)
 {
     /* MCU Configuration----------------------------------------------------------*/
@@ -58,17 +72,63 @@ int main(void)
 
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
+    MX_SDIO_SD_Init();
+    
+    /* init code for USB_DEVICE */
     MX_USB_DEVICE_Init();
 
-    HAL_Init();
-    BSP_LED_Init();  
-	
+    /* init code for FATFS */
+    MX_FATFS_Init();
+
+
+    /* Create the Tasks */
+
+    /* Led Control Task */
+    xTaskCreate(
+                LedCtlTask,                 //任务函数
+                "LedCtl",                   //任务名
+                500,                        //stack大小，单位word，也就是4字节
+                NULL,                       //任务参数
+                1,                          //任务优先级
+                &xHandleLedCtl);            //任务句柄
+
+
+
+    /* Start scheduler */
+    vTaskStartScheduler();
+
+    /* We should never get here as control is now taken by the scheduler */
+
     /* Infinite loop */
+    /* USER CODE BEGIN WHILE */
     while (1)
     {
-        HAL_Delay(1000);
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+    }
+    /* USER CODE END 3 */
+
+}
+
+
+/*******************************************************************************
+* Function Name  : LedCtlTask
+* Description    : 控制Led
+* Input          : pvParameters，创建任务时传入
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void LedCtlTask(void *pvParameters)
+{
+    BSP_LED_Init();     //Led GPIO Init
+    
+    while(1)
+    {
         BSP_LED_Toggle();
         DLog("Hello Word\r\n");
+        vTaskDelay(1000);
     }
 }
 
@@ -109,7 +169,21 @@ void SystemClock_Config(void)
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
   /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0);
+}
+
+/* SDIO init function */
+void MX_SDIO_SD_Init(void)
+{
+
+  hsd.Instance = SDIO;
+  hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
+  hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;
+  hsd.Init.ClockPowerSave = SDIO_CLOCK_POWER_SAVE_DISABLE;
+  hsd.Init.BusWide = SDIO_BUS_WIDE_1B;
+  hsd.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
+  hsd.Init.ClockDiv = 0;
+
 }
 
 /** Configure pins as 
@@ -129,6 +203,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin : PA8 */
   GPIO_InitStruct.Pin = GPIO_PIN_8;
@@ -139,10 +214,6 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT
 
