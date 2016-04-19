@@ -39,6 +39,7 @@
 #ifndef _BLUENRG_SERVICE_H_
 #define _BLUENRG_SERVICE_H_
 
+void BlueNRG_Init(void);
 void HCI_Event_CB(void *pckt);
 
 

@@ -35,7 +35,37 @@
   ******************************************************************************
   */
 #include "bluenrg_service.h"
+#include "main.h"
 
+/*
+*********************************************************************************************************
+*	函 数 名: BlueNRG_Init
+*	功能说明: BlueNRG初始化
+*	形    参：None
+*	返 回 值: None
+*********************************************************************************************************/
+void BlueNRG_Init(void)
+{
+#ifdef Debug_BlueNRF    
+    uint8_t  hwVersion;
+    uint16_t fwVersion;
+#endif
+    
+    /* Initialize the BlueNRG SPI driver */
+    BNRG_SPI_Init();
+
+    /* Initialize the BlueNRG HCI */
+    HCI_Init();
+
+    /* Reset BlueNRG hardware */
+    BlueNRG_RST();
+    
+#ifdef Debug_BlueNRF
+    /* get the BlueNRG HW and FW versions */
+    getBlueNRGVersion(&hwVersion, &fwVersion);
+    DLog("HWver %d, FWver %d", hwVersion, fwVersion);
+#endif    
+}
 
 
 /**
