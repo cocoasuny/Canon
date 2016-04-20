@@ -63,7 +63,7 @@ void BlueNRG_Init(void)
 #ifdef Debug_BlueNRF
     /* get the BlueNRG HW and FW versions */
     getBlueNRGVersion(&hwVersion, &fwVersion);
-    DLog("HWver %d, FWver %d", hwVersion, fwVersion);
+    DLog("HWver %d, FWver %d\r\n", hwVersion, fwVersion);
 #endif    
 }
 
