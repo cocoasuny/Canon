@@ -111,6 +111,12 @@ typedef uint8_t tBleStatus;
 #define BLE_INSUFFICIENT_ENC_KEYSIZE		(0x65)
 #define BLE_STATUS_CHARAC_ALREADY_EXISTS    (0x66)
 
+
+#define BLE_SET_BD_ADDR_FAILED		        (0x67)
+#define BLE_GATT_INIT_FAILED				(0x68)
+#define BLE_GAP_INIT_FAILED					(0x69)
+#define BLE_STACK_INIT_FAILED			    (0x6A)
+#define BLE_ADD_SERVICE_FAILED				(0x6B)
  /*
   * Library Error Codes
   */

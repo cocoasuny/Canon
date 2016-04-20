@@ -39,7 +39,28 @@
 #ifndef _BLUENRG_SERVICE_H_
 #define _BLUENRG_SERVICE_H_
 
+#include "stm32f4xx_hal.h"
+#include "ble_status.h"
+
+
+/*adv parameter structure*/
+typedef struct
+{
+    uint8_t               type;                 /**< See @ref BLE_GAP_ADV_TYPES. */
+    uint8_t               fp;                   /**< Filter Policy, see @ref BLE_GAP_ADV_FILTER_POLICIES. */
+    uint16_t              interval;             /**< Advertising interval between 0x0020 and 0x4000 in 0.625 ms units (20ms to 10.24s), see @ref BLE_GAP_ADV_INTERVALS.
+                                                   - If type equals @ref BLE_GAP_ADV_TYPE_ADV_DIRECT_IND, this parameter must be set to 0 for high duty cycle directed advertising.
+                                                   - If type equals @ref BLE_GAP_ADV_TYPE_ADV_DIRECT_IND, set @ref BLE_GAP_ADV_INTERVAL_MIN <= interval <= @ref BLE_GAP_ADV_INTERVAL_MAX for low duty cycle advertising.*/
+    uint16_t              timeout;              /**< Advertising timeout between 0x0001 and 0x3FFF in seconds, 0x0000 disables timeout. See also @ref BLE_GAP_ADV_TIMEOUT_VALUES. If type equals @ref BLE_GAP_ADV_TYPE_ADV_DIRECT_IND, this parameter must be set to 0 for High duty cycle directed advertising. */
+
+} ble_gap_adv_params_t;
+
+
+
 void BlueNRG_Init(void);
+void Advertising_Init(void);
+tBleStatus Ble_Device_Start_Advertising(void);
+void HCI_get_bdAddr(uint8_t *addr);
 void HCI_Event_CB(void *pckt);
 
 
