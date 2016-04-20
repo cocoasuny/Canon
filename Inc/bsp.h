@@ -42,7 +42,7 @@
 
 #define CMD_BUFFER_LEN 120
 
-
+void Bsp_Init(void);
 void BSP_LED_Init(void);
 void BSP_LED_On(void );
 void BSP_LED_Off(void);

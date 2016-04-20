@@ -34,9 +34,38 @@
 #include "bsp.h"
 #include "usbd_cdc_if.h"
 #include "usb_device.h"
+#include "main.h"
 
 
 static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
+
+
+/*
+*********************************************************************************************************
+*	函 数 名: Bsp_Init
+*	功能说明: Bsp Init
+*	形    参：None
+*	返 回 值: None
+*********************************************************************************************************/
+void Bsp_Init(void)
+{
+    /* Initialize all configured peripherals */
+    HAL_DeInit();
+    MX_GPIO_Init();
+    MX_SDIO_SD_Init();
+    
+    /* init code for USB_DEVICE */
+    MX_USB_DEVICE_Init();
+
+    /* init code for FATFS */
+    MX_FATFS_Init();  
+    
+    HAL_Delay(5000);
+    DLog("Start...\r\n");
+}    
+
+
+
 
 /**
   * @brief  Configures LED GPIO.
@@ -49,18 +78,18 @@ static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
   */
 void BSP_LED_Init(void)
 {
-  GPIO_InitTypeDef  GPIO_InitStruct;
-  
-  /* Enable the GPIO_LED clock */
-  __GPIOB_CLK_ENABLE();
+    GPIO_InitTypeDef  GPIO_InitStruct;
 
-  /* Configure the GPIO_LED pin */
-  GPIO_InitStruct.Pin = GPIO_PIN_3;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
-  
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    /* Enable the GPIO_LED clock */
+    __GPIOB_CLK_ENABLE();
+
+    /* Configure the GPIO_LED pin */
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 /**
@@ -74,7 +103,7 @@ void BSP_LED_Init(void)
   */
 void BSP_LED_On(void )
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); 
 }
 
 /**
@@ -88,7 +117,7 @@ void BSP_LED_On(void )
   */
 void BSP_LED_Off(void)
 {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); 
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); 
 }
 
 /**
@@ -102,7 +131,7 @@ void BSP_LED_Off(void)
   */
 void BSP_LED_Toggle(void)
 {
-  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
 }
 
 /*

@@ -31,11 +31,7 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "cmsis_os.h"
-#include "fatfs.h"
-#include "usb_device.h"
-#include "bsp.h"
+#include "main.h"
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -48,8 +44,6 @@ xTaskHandle  xHandleLedCtl;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_SDIO_SD_Init(void);
 void LedCtlTask(void *pvParameters);
 
 
@@ -70,16 +64,11 @@ int main(void)
     /* Configure the system clock */
     SystemClock_Config();
 
-    /* Initialize all configured peripherals */
-    MX_GPIO_Init();
-    MX_SDIO_SD_Init();
+    /* Bsp Init */
+    Bsp_Init();
     
-    /* init code for USB_DEVICE */
-    MX_USB_DEVICE_Init();
-
-    /* init code for FATFS */
-    MX_FATFS_Init();
-
+    /* BlueNRG Init */
+    BlueNRG_Init();
 
     /* Create the Tasks */
 

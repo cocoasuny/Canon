@@ -35,6 +35,7 @@
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
 #include "cmsis_os.h"
+#include "main.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -177,7 +178,10 @@ void OTG_FS_IRQHandler(void)
   /* USER CODE END OTG_FS_IRQn 1 */
 }
 
-/* USER CODE BEGIN 1 */
 
-/* USER CODE END 1 */
+void BNRG_SPI_EXTI_IRQHandler(void)
+{
+    HAL_GPIO_EXTI_IRQHandler(BNRG_SPI_EXTI_PIN);
+}
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
