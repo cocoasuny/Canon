@@ -54,7 +54,7 @@
 
 
 /* Ble parameters define */
-const char              *board_name = "CANNON V2";      //Device Name 
+const char              *board_name = "xxxx";      //Device Name 
 uint8_t                  tx_power_level = 7;            //Tx Power
 uint16_t                 adv_interval = 100;            //Adv Interval
 ble_gap_adv_params_t     m_adv_params;
@@ -114,13 +114,13 @@ void BlueNRG_Init(void)
 #endif    
     
     /* Advertising Init */
-    //Advertising_Init();
+    Advertising_Init();
     
     /* Service Init */
-    //Service_Init();
+    Service_Init();
     
     /* Start Advertise */
-    //Ble_Device_Start_Advertising();    
+    Ble_Device_Start_Advertising();    
 }
 
 /*******************************************************************************
@@ -206,7 +206,7 @@ tBleStatus Service_Init(void)
 #ifdef Debug_BlueNRF    
     if(ret != BLE_STATUS_SUCCESS) 
     {
-        DLog("GAP_Init failed.\n");
+        DLog("GAP_Init failed...0x%x\r\n",ret);
     }
 #endif    
 

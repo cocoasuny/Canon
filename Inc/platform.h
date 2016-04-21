@@ -44,10 +44,42 @@
 
 
 /* Debug Switch */
+#define PRINTFLOG
 #define Debug_BlueNRF
 
 
+
+
+
+#ifdef PRINTFLOG
+    #define DLog  printf
+#else
+    #define DLog  USBLog
+#endif    
+
+
+
+
 #define SYSCLK_FREQ 84000000
+
+
+/* Definition for USARTx clock resources */
+#define USARTx                           USART2
+#define USARTx_CLK_ENABLE()              __HAL_RCC_USART2_CLK_ENABLE();
+#define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
+#define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE() 
+
+#define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
+#define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
+
+/* Definition for USARTx Pins */
+#define USARTx_TX_PIN                    GPIO_PIN_2
+#define USARTx_TX_GPIO_PORT              GPIOA  
+#define USARTx_TX_AF                     GPIO_AF7_USART2
+#define USARTx_RX_PIN                    GPIO_PIN_3
+#define USARTx_RX_GPIO_PORT              GPIOA 
+#define USARTx_RX_AF                     GPIO_AF7_USART2
+
 
 
 /**
@@ -68,7 +100,7 @@
 #define BNRG_SPI_FIRSTBIT           SPI_FIRSTBIT_MSB
 #define BNRG_SPI_TIMODE             SPI_TIMODE_DISABLED
 #define BNRG_SPI_CRCPOLYNOMIAL      7
-#define BNRG_SPI_BAUDRATEPRESCALER  SPI_BAUDRATEPRESCALER_16
+#define BNRG_SPI_BAUDRATEPRESCALER  SPI_BAUDRATEPRESCALER_8
 #define BNRG_SPI_CRCCALCULATION     SPI_CRCCALCULATION_DISABLED
 
 // SPI Reset Pin: PB.1

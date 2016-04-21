@@ -38,7 +38,7 @@
 
 
 static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
-
+UART_HandleTypeDef UartHandle;
 
 /*
 *********************************************************************************************************
@@ -52,6 +52,7 @@ void Bsp_Init(void)
     /* Initialize all configured peripherals */
     HAL_DeInit();
     MX_GPIO_Init();
+    UART_Init();
     MX_SDIO_SD_Init();
     
     /* init code for USB_DEVICE */
@@ -60,7 +61,9 @@ void Bsp_Init(void)
     /* init code for FATFS */
     MX_FATFS_Init();  
     
-    HAL_Delay(5000);
+    #ifndef PRINTFLOG
+        HAL_Delay(5000);
+    #endif
     DLog("Start...\r\n");
 }    
 
@@ -164,7 +167,7 @@ static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen)
 *	作    者：碧云天书
 *********************************************************************************************************
 */
-void DLog(const char* lpszFormat, ...)
+void USBLog(const char* lpszFormat, ...)
 {
 	int nLen;
 	char szBuffer[CMD_BUFFER_LEN+1];
@@ -175,4 +178,123 @@ void DLog(const char* lpszFormat, ...)
 	va_end(args);
 }
 
+
+/* Private function prototypes -----------------------------------------------*/
+#ifdef __GNUC__
+/* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
+   set to 'Yes') calls __io_putchar() */
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+
+/** @defgroup HAL_MSP_Private_Functions
+  * @{
+  */
+
+
+/**
+  * @brief  Retargets the C library printf function to the USART.
+  * @param  None
+  * @retval None
+  */
+int fputc(int ch, FILE *f)
+{
+    /* Place your implementation of fputc here */
+    /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
+    HAL_StatusTypeDef status = HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
+
+    if (status != HAL_OK) {
+        //while (1);
+        return 0;
+    }
+    return ch;
+}
+
+void UART_Init(void)
+{
+    /*##-1- Configure the UART peripheral ######################################*/
+    /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
+    /* UART1 configured as follow:
+        - Word Length = 8 Bits
+        - Stop Bit = One Stop bit
+        - Parity = ODD parity
+        - BaudRate = 9600 baud
+        - Hardware flow control disabled (RTS and CTS signals) */
+    UartHandle.Instance          = USARTx;
+
+    UartHandle.Init.BaudRate     = 115200;
+    UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
+    UartHandle.Init.StopBits     = UART_STOPBITS_1;
+    UartHandle.Init.Parity       = UART_PARITY_NONE;
+    UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+    UartHandle.Init.Mode         = UART_MODE_TX;
+    UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
+
+    if(HAL_UART_Init(&UartHandle) != HAL_OK)
+    {
+        /* Initialization Error */
+        while (1);
+    }
+}
+
+
+/**
+  * @brief UART MSP Initialization
+  *        This function configures the hardware resources used in this example:
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration
+  * @param huart: UART handle pointer
+  * @retval None
+  */
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
+{
+    GPIO_InitTypeDef  GPIO_InitStruct;
+
+    /*##-1- Enable peripherals and GPIO Clocks #################################*/
+    /* Enable GPIO TX/RX clock */
+    USARTx_TX_GPIO_CLK_ENABLE();
+    USARTx_RX_GPIO_CLK_ENABLE();
+
+    /* Enable USARTx clock */
+    USARTx_CLK_ENABLE();
+
+    /*##-2- Configure peripheral GPIO ##########################################*/
+    /* UART TX GPIO pin configuration  */
+    GPIO_InitStruct.Pin       = USARTx_TX_PIN;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_PULLUP;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Alternate = USARTx_TX_AF;
+
+    HAL_GPIO_Init(USARTx_TX_GPIO_PORT, &GPIO_InitStruct);
+
+    /* UART RX GPIO pin configuration  */
+    GPIO_InitStruct.Pin = USARTx_RX_PIN;
+    GPIO_InitStruct.Alternate = USARTx_RX_AF;
+
+    HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+}
+
+/**
+  * @brief UART MSP De-Initialization
+  *        This function frees the hardware resources used in this example:
+  *          - Disable the Peripheral's clock
+  *          - Revert GPIO and NVIC configuration to their default state
+  * @param huart: UART handle pointer
+  * @retval None
+  */
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
+{
+    /*##-1- Reset peripherals ##################################################*/
+    USARTx_FORCE_RESET();
+    USARTx_RELEASE_RESET();
+
+    /*##-2- Disable peripherals and GPIO Clocks #################################*/
+    /* Configure UART Tx as alternate function  */
+    HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
+    /* Configure UART Rx as alternate function  */
+    HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+
+}
 
