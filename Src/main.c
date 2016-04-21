@@ -82,7 +82,6 @@ int main(void)
                 &xHandleLedCtl);            //ÈÎÎñ¾ä±ú
 
 
-
     /* Start scheduler */
     vTaskStartScheduler();
 
@@ -116,8 +115,8 @@ void LedCtlTask(void *pvParameters)
     while(1)
     {
         BSP_LED_Toggle();
-        DLog("Hello Word\r\n");
-        vTaskDelay(1000);
+        HCI_Process();
+        vTaskDelay(100);
     }
 }
 

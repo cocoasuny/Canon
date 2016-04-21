@@ -27,7 +27,8 @@
 #define MIN(a,b)            ((a) < (b) )? (a) : (b)
 #define MAX(a,b)            ((a) > (b) )? (a) : (b)
 
-tBleStatus aci_gap_init_IDB05A1(uint8_t role, uint8_t privacy_enabled, uint8_t device_name_char_len, uint16_t* service_handle, uint16_t* dev_name_char_handle, uint16_t* appearance_char_handle)
+#ifdef BLUENRG_MS
+tBleStatus aci_gap_init(uint8_t role, uint8_t privacy_enabled, uint8_t device_name_char_len, uint16_t* service_handle, uint16_t* dev_name_char_handle, uint16_t* appearance_char_handle)
 {
   struct hci_request rq;
   gap_init_cp_IDB05A1 cp;
@@ -60,8 +61,9 @@ tBleStatus aci_gap_init_IDB05A1(uint8_t role, uint8_t privacy_enabled, uint8_t d
   
   return 0;
 }
+#else
 
-tBleStatus aci_gap_init_IDB04A1(uint8_t role, uint16_t* service_handle, uint16_t* dev_name_char_handle, uint16_t* appearance_char_handle)
+tBleStatus aci_gap_init(uint8_t role, uint16_t* service_handle, uint16_t* dev_name_char_handle, uint16_t* appearance_char_handle)
 {
   struct hci_request rq;
   gap_init_cp_IDB04A1 cp;
@@ -92,6 +94,7 @@ tBleStatus aci_gap_init_IDB04A1(uint8_t role, uint16_t* service_handle, uint16_t
   
   return 0;
 }
+#endif
 
 tBleStatus aci_gap_set_non_discoverable(void)
 {

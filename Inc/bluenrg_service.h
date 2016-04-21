@@ -43,6 +43,22 @@
 #include "ble_status.h"
 
 
+/*Ble State*/
+#define BLE_CONNECTABLE		1
+#define BLE_NOCONNECTABLE	0
+
+
+typedef  struct _evt_gatt_attr_modified
+{
+  uint16_t conn_handle; /**< The connection handle which modified the attribute. */
+  uint16_t attr_handle; /**< Handle of the attribute that was modified. */
+  uint8_t  data_length; /**< The length of the data */
+#if BLUENRG_MS
+  uint16_t  offset; /**< Offset from which the write has been performed by the peer device */
+#endif
+  uint8_t  att_data[1]; /**< The new value (length is data_length) */
+} evt_gatt_attr_modified;
+
 /*adv parameter structure*/
 typedef struct
 {
@@ -54,6 +70,12 @@ typedef struct
     uint16_t              timeout;              /**< Advertising timeout between 0x0001 and 0x3FFF in seconds, 0x0000 disables timeout. See also @ref BLE_GAP_ADV_TIMEOUT_VALUES. If type equals @ref BLE_GAP_ADV_TYPE_ADV_DIRECT_IND, this parameter must be set to 0 for High duty cycle directed advertising. */
 
 } ble_gap_adv_params_t;
+
+typedef enum 
+{
+    CLIENT = 0, /**< CLIENT is for Central role. */
+    SERVER = 1  /**< SERVER is for Peripheral role. */
+} BLE_RoleTypeDef;
 
 
 

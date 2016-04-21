@@ -40,6 +40,7 @@
  *@{
  */
 
+#ifdef BLUENRG_MS
 /**
   * @brief  Initialize the GAP layer.
   * @note   Register the GAP service with the GATT. 
@@ -71,11 +72,12 @@
   * @param[out]  appearance_char_handle Appearance Characteristic handle
   * @retval tBleStatus Value indicating success or error code.
   */
-tBleStatus aci_gap_init_IDB05A1(uint8_t role, uint8_t privacy_enabled,
+tBleStatus aci_gap_init(uint8_t role, uint8_t privacy_enabled,
                         uint8_t device_name_char_len,
                         uint16_t* service_handle,
                         uint16_t* dev_name_char_handle,
                         uint16_t* appearance_char_handle);
+#else
 
 /**
   * @brief  Initialize the GAP layer.
@@ -108,10 +110,11 @@ tBleStatus aci_gap_init_IDB05A1(uint8_t role, uint8_t privacy_enabled,
   * @param[out]  appearance_char_handle Appearance Characteristic handle
   * @retval tBleStatus Value indicating success or error code.
   */
-tBleStatus aci_gap_init_IDB04A1(uint8_t role,
+tBleStatus aci_gap_init(uint8_t role,
                  uint16_t* service_handle,
                  uint16_t* dev_name_char_handle,
                  uint16_t* appearance_char_handle);
+#endif                 
 
 /**
   * @brief   Set the Device in non-discoverable mode.

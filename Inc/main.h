@@ -1,21 +1,25 @@
 /**
   ******************************************************************************
-  * @file           : bsp.h
-  * @version        : v1.0
-  * @brief          : Header for bsp.c file.
+  * @file    main.h
+  * @author  CL
+  * @version V1.0.0
+  * @date    04-July-2014
+  * @brief   
   ******************************************************************************
-  * COPYRIGHT(c) 2016 STMicroelectronics
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
-  * 1. Redistributions of source code must retain the above copyright notice,
-  * this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  * this list of conditions and the following disclaimer in the documentation
-  * and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of its contributors
-  * may be used to endorse or promote products derived from this software
-  * without specific prior written permission.
+  *   1. Redistributions of source code must retain the above copyright notice,
+  *      this list of conditions and the following disclaimer.
+  *   2. Redistributions in binary form must reproduce the above copyright notice,
+  *      this list of conditions and the following disclaimer in the documentation
+  *      and/or other materials provided with the distribution.
+  *   3. Neither the name of STMicroelectronics nor the names of its contributors
+  *      may be used to endorse or promote products derived from this software
+  *      without specific prior written permission.
   *
   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -29,28 +33,29 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-*/
+  */ 
+  
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __bsp_H
-#define __bsp_H
+#ifndef __MAIN_H_
+#define __MAIN_H_
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
 #include "stm32f4xx_hal.h"
-#include <stdarg.h>			/* 因为用到了va_start等va_宏，所以必须包含这个文件 */
-#include <stdio.h>			/* 因为用到了printf函数，所以必须包含这个文件 */
-
-#define CMD_BUFFER_LEN 120
-
-void UART_Init(void);
-void Bsp_Init(void);
-void BSP_LED_Init(void);
-void BSP_LED_On(void );
-void BSP_LED_Off(void);
-void BSP_LED_Toggle(void);
-void USBLog(const char* lpszFormat, ...);
+#include "fatfs.h"
+#include "cmsis_os.h"
+#include "usb_device.h"
+#include "bsp.h"
+#include "platform.h"
+#include "bluenrg_interface.h"
+#include "hci.h"
+#include "bluenrg_utils.h"
+#include "bluenrg_service.h"
 
 
+void MX_GPIO_Init(void);
+void MX_SDIO_SD_Init(void);
 
-#endif /* __bsp_H */
+
+
+#endif /* __MAIN_H_ */
 
