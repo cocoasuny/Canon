@@ -197,15 +197,17 @@
  * @name GAP Roles
  * @{
 */
-#define GAP_PERIPHERAL_ROLE_IDB05A1			(0x01)
-#define GAP_BROADCASTER_ROLE_IDB05A1		        (0x02)
-#define GAP_CENTRAL_ROLE_IDB05A1			(0x04)
-#define GAP_OBSERVER_ROLE_IDB05A1			(0x08)
-
-#define GAP_PERIPHERAL_ROLE_IDB04A1			(0x01)
-#define GAP_BROADCASTER_ROLE_IDB04A1		        (0x02)
-#define GAP_CENTRAL_ROLE_IDB04A1			(0x03)
-#define GAP_OBSERVER_ROLE_IDB04A1			(0x04)
+#ifdef BLUENRG_MS
+    #define GAP_PERIPHERAL_ROLE			        (0x01)
+    #define GAP_BROADCASTER_ROLE		        (0x02)
+    #define GAP_CENTRAL_ROLE			        (0x04)
+    #define GAP_OBSERVER_ROLE			        (0x08)
+#else
+    #define GAP_PERIPHERAL_ROLE			        (0x01)
+    #define GAP_BROADCASTER_ROLE		        (0x02)
+    #define GAP_CENTRAL_ROLE			        (0x03)
+    #define GAP_OBSERVER_ROLE       			(0x04)
+#endif
 
 /**
  * @}
