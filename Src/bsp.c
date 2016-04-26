@@ -300,5 +300,5 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 
 void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name)
 {
-	DLog("\r\nErr = %d,file = %s,line = %d.\r\n",error_code,p_file_name,line_num);
+	DLog("\r\nErr = 0x%x,file = %s,line = %d.\r\n",error_code,p_file_name,line_num);
 }

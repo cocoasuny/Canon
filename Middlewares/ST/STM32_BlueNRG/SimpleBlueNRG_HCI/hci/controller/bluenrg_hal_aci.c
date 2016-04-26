@@ -33,7 +33,7 @@ tBleStatus aci_hal_write_config_data(uint8_t offset,
                                     const uint8_t *val)
 {
   struct hci_request rq;
-  uint8_t status;
+  uint8_t status = BLE_STATUS_ERROR;
   uint8_t buffer[HCI_MAX_PAYLOAD_SIZE];
   uint8_t indx = 0;
     

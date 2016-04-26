@@ -63,9 +63,7 @@ typedef  struct _evt_gatt_attr_modified
   uint16_t conn_handle; /**< The connection handle which modified the attribute. */
   uint16_t attr_handle; /**< Handle of the attribute that was modified. */
   uint8_t  data_length; /**< The length of the data */
-#if BLUENRG_MS
   uint16_t  offset; /**< Offset from which the write has been performed by the peer device */
-#endif
   uint8_t  att_data[1]; /**< The new value (length is data_length) */
 } evt_gatt_attr_modified;
 
@@ -91,10 +89,12 @@ typedef enum
 
 void BlueNRG_Init(void);
 void Advertising_Init(void);
-tBleStatus Ble_Device_Start_Advertising(void);
-void HCI_get_bdAddr(uint8_t *addr);
 void HCI_Event_CB(void *pckt);
+tBleStatus Service_Init(void);
 
+void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle);
+void GAP_DisconnectionComplete_CB(void);
+void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data);
 
 
 #endif /* _BLUENRG_SERVICE_H_ */
