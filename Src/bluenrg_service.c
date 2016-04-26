@@ -242,6 +242,7 @@ tBleStatus Service_Init(void)
 
      /**********  add  SERVICEs ***********/
         Add_Service();
+        Add_Acc_Service();
     }
     else
     {
@@ -255,11 +256,11 @@ tBleStatus Service_Init(void)
 static tBleStatus Add_Service(void)
 {
     tBleStatus ret;
-    uint8_t service_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x00, 0x80, 0x00, 0x00};
-    uint8_t command_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x01, 0x80, 0x00, 0x00};
-    uint8_t event_char_uuid[16] = {  0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x02, 0x80, 0x00, 0x00};
-    uint8_t bulkout_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x03, 0x80, 0x00, 0x00};
-    uint8_t bulkin_uuid[16] = {  0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x04, 0x80, 0x00, 0x00};
+    uint8_t service_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x00, 0x80, 0x00, 0x00};
+    uint8_t command_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x01, 0x80, 0x00, 0x00};
+    uint8_t event_char_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x02, 0x80, 0x00, 0x00};
+    uint8_t bulkout_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x03, 0x80, 0x00, 0x00};
+    uint8_t bulkin_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x04, 0x80, 0x00, 0x00};
     /*add service*/
     ret = aci_gatt_add_serv(UUID_TYPE_128,  service_uuid, PRIMARY_SERVICE, 11,
                             &BLueNrgServHandle);
@@ -522,13 +523,30 @@ void GATT_Notification_CB(uint16_t attr_handle, uint8_t attr_len, uint8_t *attr_
     }
   #endif
 }
+/*******************************************************************************
+* Function Name  : Read_Request_CB
+* Description    : HCI_Event_CB中调用，App请求读时，HCI_Event_CB调用此函数
+* Input          : Handle of the attribute
+* Output         : None
+* Return         : None
+*******************************************************************************/
 static void Read_Request_CB(uint16_t handle)
 {
-    if(handle == BLueNrgServHandle + 1) {
-        //Acc_Update((AxesRaw_t*)&axes_data);
+    //根据不同的handle进行处理(为什么加1？？？？)
+    if(handle == BLueNrgServHandle + 1) 
+    {
+        
+    }
+    else if(handle == accCharHandle + 1)
+    {
+        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
     }
 
-    if(connection_handle != 0) {
+    
+    
+    //Exit:
+    if(connection_handle != 0) 
+    {
         aci_gatt_allow_read(connection_handle);
     }
 }
@@ -554,155 +572,97 @@ void HCI_Event_CB(void *pckt)
     if(hci_pckt->type != HCI_EVENT_PKT)
         return;
 
-    switch(event_pckt->evt) {
-
-    case EVT_DISCONN_COMPLETE:
+    switch(event_pckt->evt) 
     {
-        #ifdef CLIENT_ROLE
-          host_notification_enabled = 0;
-        #endif
-        notification_enabled = 0;
-        ble_device_on_disconnect(event_pckt->data[3]);
-         /*Host*/
-         GAP_DisconnectionComplete_CB();
-    }
-    break;
-
-    case EVT_LE_META_EVENT:
-    {
-        evt_le_meta_event *evt = (void *)event_pckt->data;
-        switch(evt->subevent) {
-        case EVT_LE_CONN_COMPLETE:
+        case EVT_DISCONN_COMPLETE:
         {
-
-            //ble_device_on_connect();
-            evt_le_connection_complete *cc = (void *)evt->data;
-            connection_information(cc->handle);
-            /*host*/
-            GAP_ConnectionComplete_CB(cc->peer_bdaddr, cc->handle);
-
-        }
-        break;
-        case EVT_LE_ADVERTISING_REPORT:
-        {
-            le_advertising_info* adv_data = (void *)((event_pckt->data)+2);
             #ifdef CLIENT_ROLE
-              ble_host_device_found(adv_data);
+              host_notification_enabled = 0;
             #endif
+            notification_enabled = 0;
+            ble_device_on_disconnect(event_pckt->data[3]);
+             /*Host*/
+            GAP_DisconnectionComplete_CB();
         }
         break;
-        }
-    }
-    break;
 
-    case EVT_VENDOR:
-    {
-        evt_blue_aci *blue_evt = (void*)event_pckt->data;
-        switch(blue_evt->ecode) {
-        case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+        case EVT_LE_META_EVENT:
         {
-            /* this callback is invoked when a GATT attribute is modified
-            extract callback data and pass to suitable handler function */
-            evt_gatt_attr_modified *evt = (evt_gatt_attr_modified*)blue_evt->data;
-            ///on message
-            if(evt->att_data[1] > 0) {
-                ble_device_on_message(evt->att_data[0], evt->att_data[1], (evt->att_data)+2);
-            } else if(evt->att_data[0] == 1) {
-                notification_enabled = 1;
-                #ifdef CLIENT_ROLE
-                  host_notification_enabled = 1;
-                #endif
+            evt_le_meta_event *evt = (void *)event_pckt->data;
+            
+            switch(evt->subevent) 
+            {
+                case EVT_LE_CONN_COMPLETE:
+                {
+                    //ble_device_on_connect();
+                    evt_le_connection_complete *cc = (void *)evt->data;
+                    connection_information(cc->handle);
+                    /*host*/
+                    GAP_ConnectionComplete_CB(cc->peer_bdaddr, cc->handle);
+
+                }
+                break;
+                case EVT_LE_ADVERTISING_REPORT:
+                {
+                    le_advertising_info* adv_data = (void *)((event_pckt->data)+2);
+                    #ifdef CLIENT_ROLE
+                      ble_host_device_found(adv_data);
+                    #endif
+                }
+                break;
             }
         }
         break;
-        case EVT_BLUE_GATT_NOTIFICATION:
+
+        case EVT_VENDOR:
         {
-            evt_gatt_attr_notification *evt = (evt_gatt_attr_notification*)blue_evt->data;
-            GATT_Notification_CB(evt->attr_handle, evt->event_data_length - 2, evt->attr_value);
+            evt_blue_aci *blue_evt = (void*)event_pckt->data;
+            switch(blue_evt->ecode) 
+            {
+                case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+                {
+                    /* this callback is invoked when a GATT attribute is modified
+                    extract callback data and pass to suitable handler function */
+                    evt_gatt_attr_modified *evt = (evt_gatt_attr_modified*)blue_evt->data;
+                    ///on message
+                    if(evt->att_data[1] > 0) 
+                    {
+                        ble_device_on_message(evt->att_data[0], evt->att_data[1], (evt->att_data)+2);
+                    } 
+                    else if(evt->att_data[0] == 1) 
+                    {
+                        notification_enabled = 1;
+                        #ifdef CLIENT_ROLE
+                          host_notification_enabled = 1;
+                        #endif
+                    }
+                }
+                break;
+                case EVT_BLUE_GATT_NOTIFICATION:
+                {
+                    evt_gatt_attr_notification *evt = (evt_gatt_attr_notification*)blue_evt->data;
+                    GATT_Notification_CB(evt->attr_handle, evt->event_data_length - 2, evt->attr_value);
+                }
+                break;
+                case EVT_BLUE_GATT_READ_PERMIT_REQ:
+                {
+                    evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
+                    Read_Request_CB(pr->attr_handle);
+                }
+                break;
+                case EVT_BLUE_GAP_DEVICE_FOUND:
+                {
+                    printf("scanned one device\n\r");
+                }
+                break;
+                case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
+                {
+
+                }
+                break;
+            }
         }
         break;
-        case EVT_BLUE_GATT_READ_PERMIT_REQ:
-        {
-            evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
-            Read_Request_CB(pr->attr_handle);
-        }
-        break;
-        case EVT_BLUE_GAP_DEVICE_FOUND:
-        {
-            printf("scanned one device\n\r");
-        }
-        break;
-        case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
-        {
-
-        }
-        break;
-#if 1
-        case EVT_BLUE_GATT_DISC_READ_CHAR_BY_UUID_RESP:
-            #ifdef CLIENT_ROLE
-              if(BLE_Role == CLIENT) {
-                  printf("EVT_BLUE_GATT_DISC_READ_CHAR_BY_UUID_RESP\n");
-
-                  evt_gatt_disc_read_char_by_uuid_resp *resp = (void*)blue_evt->data;
-
-                  if (start_read_write_char_handle && !end_read_write_char_handle)
-                  {
-                      write_handle = resp->attr_handle;
-                      printf("write_handle  %04X\n", write_handle);
-                  }
-                  else if (start_read_notify_read_char_handle && !end_read_notify_read_char_handle)
-                  {
-                      notify_read_handle = resp->attr_handle;
-                      printf("notify_read_handle  %04X\n", notify_read_handle);
-                  }
-                  else if (start_read_write_without_rsp_char_handle && !end_read_write_without_rsp_char_handle)
-                  {
-                      write_without_rsp_handle = resp->attr_handle;
-                      printf("write_without_rsp_handle  %04X\n", write_without_rsp_handle);
-                  }
-                  else if (start_read_notify_char_handle && !end_read_notify_char_handle)
-                  {
-                      notify_handle = resp->attr_handle;
-                      printf("notify_handle %04X\n", notify_handle);
-                  }
-              }
-            #endif
-            break;
-
-        case EVT_BLUE_GATT_PROCEDURE_COMPLETE:
-            #ifdef CLIENT_ROLE
-              if(BLE_Role == CLIENT) {
-                  /* Wait for gatt procedure complete event trigger related to Discovery Charac by UUID */
-                  //evt_gatt_procedure_complete *pr = (void*)blue_evt->data;
-
-                  if (start_read_write_char_handle && !end_read_write_char_handle)
-                  {
-                      end_read_write_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-
-                  }
-                  else if (start_read_notify_read_char_handle && !end_read_notify_read_char_handle)
-                  {
-                      end_read_notify_read_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-                  else if (start_read_write_without_rsp_char_handle && !end_read_write_without_rsp_char_handle)
-                  {
-                      end_read_write_without_rsp_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-                  else if (start_read_notify_char_handle && !end_read_notify_char_handle)
-                  {
-                      end_read_notify_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-              }
-            #endif
-            break;
-#endif
-        }
-    }
-    break;
     }
 }
 

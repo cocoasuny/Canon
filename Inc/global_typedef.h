@@ -1,25 +1,21 @@
 /**
   ******************************************************************************
-  * @file    main.h
-  * @author  CL
-  * @version V1.0.0
-  * @date    04-July-2014
-  * @brief   
+  * @file           : global_typedef.h
+  * @version        : v1.0
+  * @brief          : 
   ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * COPYRIGHT(c) 2016 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
+  * 1. Redistributions of source code must retain the above copyright notice,
+  * this list of conditions and the following disclaimer.
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  * this list of conditions and the following disclaimer in the documentation
+  * and/or other materials provided with the distribution.
+  * 3. Neither the name of STMicroelectronics nor the names of its contributors
+  * may be used to endorse or promote products derived from this software
+  * without specific prior written permission.
   *
   * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -33,35 +29,26 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */ 
-  
+*/
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H_
-#define __MAIN_H_
+#ifndef __GLOBALTYPEDEF_H
+#define __GLOBALTYPEDEF_H
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx.h"
 #include "stm32f4xx_hal.h"
-#include "fatfs.h"
-#include "cmsis_os.h"
-#include "usb_device.h"
-#include "bsp.h"
-#include "platform.h"
-#include "bluenrg_interface.h"
-#include "hci.h"
-#include "bluenrg_utils.h"
-#include "bluenrg_service.h"
-#include "freertostask.h"
-#include "bluenrg_sensor_service.h"
-#include "global_typedef.h"
 
 
-extern volatile AxesRaw_t g_Axes_data;
-
-
-void MX_GPIO_Init(void);
-void MX_SDIO_SD_Init(void);
+/** 
+ * @brief Structure containing acceleration value (in mg) of each axis.
+ */
+typedef struct {
+  int AXIS_X;
+  int AXIS_Y;
+  int AXIS_Z;
+} AxesRaw_t;
 
 
 
-#endif /* __MAIN_H_ */
+#endif /* __GLOBALTYPEDEF_H */
 

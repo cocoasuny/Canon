@@ -40,6 +40,18 @@
 #include <stdarg.h>			/* 因为用到了va_start等va_宏，所以必须包含这个文件 */
 #include <stdio.h>			/* 因为用到了printf函数，所以必须包含这个文件 */
 
+
+/* Store Value into a buffer in Little Endian Format */
+#define STORE_LE_16(buf, val)    ( ((buf)[0] =  (uint8_t) (val)    ) , \
+                                   ((buf)[1] =  (uint8_t) (val>>8) ) )
+/**/
+
+#define App_Error_Check(ERR_CODE)                         \
+    do                                                      \
+    {                                                       \
+        app_error_handler((ERR_CODE), __LINE__, (uint8_t*) __FILE__);  \
+    } while (0)
+
 #define CMD_BUFFER_LEN 120
 
 void UART_Init(void);
@@ -49,7 +61,7 @@ void BSP_LED_On(void );
 void BSP_LED_Off(void);
 void BSP_LED_Toggle(void);
 void USBLog(const char* lpszFormat, ...);
-
+void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name);
 
 
 #endif /* __bsp_H */

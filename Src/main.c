@@ -34,6 +34,9 @@
 #include "main.h"
 
 
+/* Global variables ----------------------------------------------------------*/
+volatile AxesRaw_t g_Axes_data = {0, 0, 0};
+
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;
 HAL_SD_CardInfoTypedef SDCardInfo;
@@ -123,6 +126,12 @@ void LedCtlTask(void *pvParameters)
     while(1)
     {
         BSP_LED_Toggle();
+        
+        /* for test */
+        g_Axes_data.AXIS_X += 100;
+        g_Axes_data.AXIS_Y += 100;
+        g_Axes_data.AXIS_Z += 100;
+        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
         vTaskDelay(1000);
     }
 }
