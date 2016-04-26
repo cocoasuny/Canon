@@ -34,12 +34,16 @@
 #include "main.h"
 
 
+/* Global variables ----------------------------------------------------------*/
+volatile AxesRaw_t g_Axes_data = {0, 0, 0};
+
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;
 HAL_SD_CardInfoTypedef SDCardInfo;
 
 /* Private variables ---------------------------------------------------------*/
 xTaskHandle  xHandleLedCtl;
+xTaskHandle  xHandleBlueNRGHCI;
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -80,8 +84,16 @@ int main(void)
                 NULL,                       //任务参数
                 1,                          //任务优先级
                 &xHandleLedCtl);            //任务句柄
-
-
+                
+    /* BlueNRG HCI Task */
+    xTaskCreate(
+                BlueNRGHCITask,             //任务函数
+                "BlueHCI",                  //任务名
+                Task_BlueNRGHCI_Stack,      //stack大小，单位word，也就是4字节
+                NULL,                       //任务参数
+                Task_BlueNRGHCI_Priority,   //任务优先级
+                &xHandleBlueNRGHCI);        //任务句柄                
+                
     /* Start scheduler */
     vTaskStartScheduler();
 
@@ -100,7 +112,6 @@ int main(void)
 
 }
 
-
 /*******************************************************************************
 * Function Name  : LedCtlTask
 * Description    : 控制Led
@@ -115,8 +126,13 @@ void LedCtlTask(void *pvParameters)
     while(1)
     {
         BSP_LED_Toggle();
-        HCI_Process();
-        vTaskDelay(100);
+        
+        /* for test */
+        g_Axes_data.AXIS_X += 100;
+        g_Axes_data.AXIS_Y += 100;
+        g_Axes_data.AXIS_Z += 100;
+        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
+        vTaskDelay(1000);
     }
 }
 

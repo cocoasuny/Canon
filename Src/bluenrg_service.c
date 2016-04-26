@@ -54,7 +54,7 @@
 
 
 /* Ble parameters define */
-const char              *board_name = "xxxx";      //Device Name 
+const char              *board_name = "xxxx";      //Device Name
 uint8_t                  tx_power_level = 7;            //Tx Power
 uint16_t                 adv_interval = 100;            //Adv Interval
 ble_gap_adv_params_t     m_adv_params;
@@ -93,11 +93,11 @@ void ble_device_on_disconnect(uint8_t reason);
 *********************************************************************************************************/
 void BlueNRG_Init(void)
 {
-#ifdef Debug_BlueNRF    
+#ifdef Debug_BlueNRF
     uint8_t  hwVersion;
     uint16_t fwVersion;
 #endif
-    
+
     /* Initialize the BlueNRG SPI driver */
     BNRG_SPI_Init();
 
@@ -106,38 +106,38 @@ void BlueNRG_Init(void)
 
     /* Reset BlueNRG hardware */
     BlueNRG_RST();
-    
+
 #ifdef Debug_BlueNRF
     /* get the BlueNRG HW and FW versions */
     getBlueNRGVersion(&hwVersion, &fwVersion);
     DLog("HWver %d, FWver %d\r\n", hwVersion, fwVersion);
-#endif    
-    
+#endif
+
     /* Advertising Init */
     Advertising_Init();
-    
+
     /* Service Init */
     Service_Init();
-    
+
     /* Start Advertise */
-    Ble_Device_Start_Advertising();    
+    Ble_Device_Start_Advertising();
 }
 
 /*******************************************************************************
 * Function Name  : Advertising_Init
 * Description    : 蓝牙广播数据初始化
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
 void Advertising_Init(void)
 {
     uint8_t bdAddr[6];
-    char name[32]; 
-    
+    char name[32];
+
     HCI_get_bdAddr(bdAddr);
     sprintf(name, "%s %01x%01x", board_name, bdAddr[0], bdAddr[1]);
-    
+
     /*Config Adv Parameter And Ready to Adv*/
     ble_set_adv_param(name, bdAddr, tx_power_level, adv_interval);
 }
@@ -145,7 +145,7 @@ void Advertising_Init(void)
 /*******************************************************************************
 * Function Name  : Ble_Device_Start_Advertising
 * Description    : 蓝牙开始广播
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -169,23 +169,23 @@ tBleStatus Ble_Device_Start_Advertising(void)
 /*******************************************************************************
 * Function Name  : Service_Init
 * Description    : 服务初始化
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
 tBleStatus Service_Init(void)
 {
     tBleStatus ret;
-    
+
     /*gatt_Init*/
     ret = aci_gatt_init();
 
-    if(ret) 
+    if(ret)
     {
         return BLE_GATT_INIT_FAILED;
     }
 
-    if(BLE_Role == SERVER) 
+    if(BLE_Role == SERVER)
     {
 #ifdef BLUENRG_MS
         /*BUG: Name Length*/
@@ -193,8 +193,8 @@ tBleStatus Service_Init(void)
 #else
         ret = aci_gap_init(GAP_PERIPHERAL_ROLE, &service_handle, &dev_name_char_handle, &appearance_char_handle);
 #endif
-    } 
-    else 
+    }
+    else
     {
 #ifdef BLUENRG_MS
         /*BUG: Name Length*/
@@ -203,14 +203,14 @@ tBleStatus Service_Init(void)
         ret = aci_gap_init(GAP_CENTRAL_ROLE, &service_handle, &dev_name_char_handle, &appearance_char_handle);
 #endif
     }
-#ifdef Debug_BlueNRF    
-    if(ret != BLE_STATUS_SUCCESS) 
+#ifdef Debug_BlueNRF
+    if(ret != BLE_STATUS_SUCCESS)
     {
         DLog("GAP_Init failed...0x%x\r\n",ret);
     }
-#endif    
+#endif
 
-    if(ret != BLE_STATUS_SUCCESS) 
+    if(ret != BLE_STATUS_SUCCESS)
     {
         return BLE_GAP_INIT_FAILED;
     }
@@ -223,43 +223,44 @@ tBleStatus Service_Init(void)
                                        USE_FIXED_PIN_FOR_PAIRING,
                                        123456,
                                        BONDING);
-#ifdef Debug_BlueNRF    
+#ifdef Debug_BlueNRF
     if (ret == BLE_STATUS_SUCCESS)
     {
-        printf("BLE Stack Initialized.\n");
+        printf("BLE Stack Initialized.\r\n");
     }
-#endif    
+#endif
 
-    if (ret != BLE_STATUS_SUCCESS) 
+    if (ret != BLE_STATUS_SUCCESS)
     {
         return BLE_STACK_INIT_FAILED;
     }
-    if(BLE_Role == SERVER) 
+    if(BLE_Role == SERVER)
     {
-#ifdef Debug_BlueNRF         
-        printf("SERVER: BLE Stack Initialized\n");
-#endif        
-        
+#ifdef Debug_BlueNRF
+        printf("SERVER: BLE Stack Initialized\r\n");
+#endif
+
      /**********  add  SERVICEs ***********/
         Add_Service();
-    } 
-    else 
+        Add_Acc_Service();
+    }
+    else
     {
-#ifdef Debug_BlueNRF         
-        DLog("CLIENT: BLE Stack Initialized\n");
-#endif        
+#ifdef Debug_BlueNRF
+        DLog("CLIENT: BLE Stack Initialized\r\n");
+#endif
     }
 
-    return 0;    
+    return 0;
 }
 static tBleStatus Add_Service(void)
 {
     tBleStatus ret;
-    uint8_t service_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x00, 0x80, 0x00, 0x00};
-    uint8_t command_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x01, 0x80, 0x00, 0x00};
-    uint8_t event_char_uuid[16] = {  0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x02, 0x80, 0x00, 0x00};
-    uint8_t bulkout_uuid[16] = { 0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x03, 0x80, 0x00, 0x00};
-    uint8_t bulkin_uuid[16] = {  0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x04, 0x80, 0x00, 0x00};
+    uint8_t service_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x00, 0x80, 0x00, 0x00};
+    uint8_t command_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x01, 0x80, 0x00, 0x00};
+    uint8_t event_char_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x02, 0x80, 0x00, 0x00};
+    uint8_t bulkout_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x03, 0x80, 0x00, 0x00};
+    uint8_t bulkin_uuid[16] = {0x8C, 0xF9, 0x97,0xA6, 0xEE, 0x94, 0xE3,0xBC,0xF8, 0x21, 0xB2, 0x60, 0x04, 0x80, 0x00, 0x00};
     /*add service*/
     ret = aci_gatt_add_serv(UUID_TYPE_128,  service_uuid, PRIMARY_SERVICE, 11,
                             &BLueNrgServHandle);
@@ -299,7 +300,7 @@ fail:
 /*******************************************************************************
 * Function Name  : HCI_get_bdAddr
 * Description    : 获取设备唯一ID
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -322,7 +323,7 @@ void HCI_get_bdAddr(uint8_t *addr)
 /*******************************************************************************
 * Function Name  : ble_set_adv_param
 * Description    : 设置蓝牙广播数据
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -330,13 +331,13 @@ void ble_set_adv_param(char* adv_name, uint8_t*adv_address, uint8_t tx_power_pev
 {
     /*Set Adv Address*/
     ble_address(adv_address);
-    
+
     /*Set Adv Name*/
     ble_device_set_name(adv_name);
-        
+
     /*Set Tx Power Level*/
     ble_set_tx_power(tx_power_pevel);
-    
+
     /* Range: 0x0020 to 0x4000
        Default: 1.28 s
        Time = AdvInterval * 0.625 msec
@@ -347,7 +348,7 @@ void ble_set_adv_param(char* adv_name, uint8_t*adv_address, uint8_t tx_power_pev
 /*******************************************************************************
 * Function Name  : ble_address
 * Description    : 设置蓝牙地址
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -357,17 +358,17 @@ tBleStatus ble_address(uint8_t* advaddress)
     ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
                                     CONFIG_DATA_PUBADDR_LEN,
                                     advaddress);
-    if(ret) 
+    if(ret)
     {
         return BLE_SET_BD_ADDR_FAILED;
     }
-    
+
     return 0;
 }
 /*******************************************************************************
 * Function Name  : ble_device_set_name
 * Description    : 设置蓝牙设备名称
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -384,7 +385,7 @@ tBleStatus ble_device_set_name(const char* new_device_name)
 /*******************************************************************************
 * Function Name  : ble_set_tx_power
 * Description    : 设置蓝牙发送功率
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -399,7 +400,7 @@ tBleStatus ble_set_tx_power(uint8_t level)
 /*******************************************************************************
 * Function Name  : ble_device_set_advertising_interval
 * Description    : 设置蓝牙广播间隔
-* Input          : None 
+* Input          : None
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -491,7 +492,7 @@ void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
         printf("%02X-", addr[i]);
     }
     printf("%02X\n", addr[0]);
-    
+
     /*discover device*/
     ble_host_discover_char(NULL);
  #endif
@@ -522,13 +523,30 @@ void GATT_Notification_CB(uint16_t attr_handle, uint8_t attr_len, uint8_t *attr_
     }
   #endif
 }
+/*******************************************************************************
+* Function Name  : Read_Request_CB
+* Description    : HCI_Event_CB中调用，App请求读时，HCI_Event_CB调用此函数
+* Input          : Handle of the attribute
+* Output         : None
+* Return         : None
+*******************************************************************************/
 static void Read_Request_CB(uint16_t handle)
 {
-    if(handle == BLueNrgServHandle + 1) {
-        //Acc_Update((AxesRaw_t*)&axes_data);
+    //根据不同的handle进行处理(为什么加1？？？？)
+    if(handle == BLueNrgServHandle + 1) 
+    {
+        
+    }
+    else if(handle == accCharHandle + 1)
+    {
+        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
     }
 
-    if(connection_handle != 0) {
+    
+    
+    //Exit:
+    if(connection_handle != 0) 
+    {
         aci_gatt_allow_read(connection_handle);
     }
 }
@@ -554,155 +572,97 @@ void HCI_Event_CB(void *pckt)
     if(hci_pckt->type != HCI_EVENT_PKT)
         return;
 
-    switch(event_pckt->evt) {
-
-    case EVT_DISCONN_COMPLETE:
+    switch(event_pckt->evt) 
     {
-        #ifdef CLIENT_ROLE
-          host_notification_enabled = 0;
-        #endif
-        notification_enabled = 0;
-        ble_device_on_disconnect(event_pckt->data[3]);
-         /*Host*/
-         GAP_DisconnectionComplete_CB();
-    }
-    break;
-
-    case EVT_LE_META_EVENT:
-    {
-        evt_le_meta_event *evt = (void *)event_pckt->data;
-        switch(evt->subevent) {
-        case EVT_LE_CONN_COMPLETE:
+        case EVT_DISCONN_COMPLETE:
         {
-
-            //ble_device_on_connect();
-            evt_le_connection_complete *cc = (void *)evt->data;
-            connection_information(cc->handle);
-            /*host*/
-            GAP_ConnectionComplete_CB(cc->peer_bdaddr, cc->handle);
-
-        }
-        break;
-        case EVT_LE_ADVERTISING_REPORT:
-        {
-            le_advertising_info* adv_data = (void *)((event_pckt->data)+2);
             #ifdef CLIENT_ROLE
-              ble_host_device_found(adv_data);
+              host_notification_enabled = 0;
             #endif
+            notification_enabled = 0;
+            ble_device_on_disconnect(event_pckt->data[3]);
+             /*Host*/
+            GAP_DisconnectionComplete_CB();
         }
         break;
-        }
-    }
-    break;
 
-    case EVT_VENDOR:
-    {
-        evt_blue_aci *blue_evt = (void*)event_pckt->data;
-        switch(blue_evt->ecode) {
-        case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+        case EVT_LE_META_EVENT:
         {
-            /* this callback is invoked when a GATT attribute is modified
-            extract callback data and pass to suitable handler function */
-            evt_gatt_attr_modified *evt = (evt_gatt_attr_modified*)blue_evt->data;
-            ///on message
-            if(evt->att_data[1] > 0) {
-                ble_device_on_message(evt->att_data[0], evt->att_data[1], (evt->att_data)+2);
-            } else if(evt->att_data[0] == 1) {
-                notification_enabled = 1;
-                #ifdef CLIENT_ROLE
-                  host_notification_enabled = 1;
-                #endif
+            evt_le_meta_event *evt = (void *)event_pckt->data;
+            
+            switch(evt->subevent) 
+            {
+                case EVT_LE_CONN_COMPLETE:
+                {
+                    //ble_device_on_connect();
+                    evt_le_connection_complete *cc = (void *)evt->data;
+                    connection_information(cc->handle);
+                    /*host*/
+                    GAP_ConnectionComplete_CB(cc->peer_bdaddr, cc->handle);
+
+                }
+                break;
+                case EVT_LE_ADVERTISING_REPORT:
+                {
+                    le_advertising_info* adv_data = (void *)((event_pckt->data)+2);
+                    #ifdef CLIENT_ROLE
+                      ble_host_device_found(adv_data);
+                    #endif
+                }
+                break;
             }
         }
         break;
-        case EVT_BLUE_GATT_NOTIFICATION:
+
+        case EVT_VENDOR:
         {
-            evt_gatt_attr_notification *evt = (evt_gatt_attr_notification*)blue_evt->data;
-            GATT_Notification_CB(evt->attr_handle, evt->event_data_length - 2, evt->attr_value);
+            evt_blue_aci *blue_evt = (void*)event_pckt->data;
+            switch(blue_evt->ecode) 
+            {
+                case EVT_BLUE_GATT_ATTRIBUTE_MODIFIED:
+                {
+                    /* this callback is invoked when a GATT attribute is modified
+                    extract callback data and pass to suitable handler function */
+                    evt_gatt_attr_modified *evt = (evt_gatt_attr_modified*)blue_evt->data;
+                    ///on message
+                    if(evt->att_data[1] > 0) 
+                    {
+                        ble_device_on_message(evt->att_data[0], evt->att_data[1], (evt->att_data)+2);
+                    } 
+                    else if(evt->att_data[0] == 1) 
+                    {
+                        notification_enabled = 1;
+                        #ifdef CLIENT_ROLE
+                          host_notification_enabled = 1;
+                        #endif
+                    }
+                }
+                break;
+                case EVT_BLUE_GATT_NOTIFICATION:
+                {
+                    evt_gatt_attr_notification *evt = (evt_gatt_attr_notification*)blue_evt->data;
+                    GATT_Notification_CB(evt->attr_handle, evt->event_data_length - 2, evt->attr_value);
+                }
+                break;
+                case EVT_BLUE_GATT_READ_PERMIT_REQ:
+                {
+                    evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
+                    Read_Request_CB(pr->attr_handle);
+                }
+                break;
+                case EVT_BLUE_GAP_DEVICE_FOUND:
+                {
+                    printf("scanned one device\n\r");
+                }
+                break;
+                case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
+                {
+
+                }
+                break;
+            }
         }
         break;
-        case EVT_BLUE_GATT_READ_PERMIT_REQ:
-        {
-            evt_gatt_read_permit_req *pr = (void*)blue_evt->data;
-            Read_Request_CB(pr->attr_handle);
-        }
-        break;
-        case EVT_BLUE_GAP_DEVICE_FOUND:
-        {
-            printf("scanned one device\n\r");
-        }
-        break;
-        case EVT_BLUE_GAP_PROCEDURE_COMPLETE:
-        {
-
-        }
-        break;
-#if 1
-        case EVT_BLUE_GATT_DISC_READ_CHAR_BY_UUID_RESP:
-            #ifdef CLIENT_ROLE
-              if(BLE_Role == CLIENT) {
-                  printf("EVT_BLUE_GATT_DISC_READ_CHAR_BY_UUID_RESP\n");
-
-                  evt_gatt_disc_read_char_by_uuid_resp *resp = (void*)blue_evt->data;
-
-                  if (start_read_write_char_handle && !end_read_write_char_handle)
-                  {
-                      write_handle = resp->attr_handle;
-                      printf("write_handle  %04X\n", write_handle);
-                  }
-                  else if (start_read_notify_read_char_handle && !end_read_notify_read_char_handle)
-                  {
-                      notify_read_handle = resp->attr_handle;
-                      printf("notify_read_handle  %04X\n", notify_read_handle);
-                  }
-                  else if (start_read_write_without_rsp_char_handle && !end_read_write_without_rsp_char_handle)
-                  {
-                      write_without_rsp_handle = resp->attr_handle;
-                      printf("write_without_rsp_handle  %04X\n", write_without_rsp_handle);
-                  }
-                  else if (start_read_notify_char_handle && !end_read_notify_char_handle)
-                  {
-                      notify_handle = resp->attr_handle;
-                      printf("notify_handle %04X\n", notify_handle);
-                  }
-              }
-            #endif
-            break;
-
-        case EVT_BLUE_GATT_PROCEDURE_COMPLETE:
-            #ifdef CLIENT_ROLE
-              if(BLE_Role == CLIENT) {
-                  /* Wait for gatt procedure complete event trigger related to Discovery Charac by UUID */
-                  //evt_gatt_procedure_complete *pr = (void*)blue_evt->data;
-
-                  if (start_read_write_char_handle && !end_read_write_char_handle)
-                  {
-                      end_read_write_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-
-                  }
-                  else if (start_read_notify_read_char_handle && !end_read_notify_read_char_handle)
-                  {
-                      end_read_notify_read_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-                  else if (start_read_write_without_rsp_char_handle && !end_read_write_without_rsp_char_handle)
-                  {
-                      end_read_write_without_rsp_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-                  else if (start_read_notify_char_handle && !end_read_notify_char_handle)
-                  {
-                      end_read_notify_char_handle = TRUE;
-                      run_when_idle(ble_host_discover_char, NULL);
-                  }
-              }
-            #endif
-            break;
-#endif
-        }
-    }
-    break;
     }
 }
 
