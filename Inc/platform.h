@@ -48,6 +48,10 @@
 #define Debug_BlueNRF
 
 
+/******** Task define ********************/
+/* BlueNRG HCI Process Task */
+#define Task_BlueNRGHCI_Stack        500    //task stack
+#define Task_BlueNRGHCI_Priority     2      //task priority
 
 
 

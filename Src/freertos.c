@@ -34,27 +34,26 @@
 /* Includes ------------------------------------------------------------------*/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "freertostask.h"
 
-/* USER CODE BEGIN Includes */     
+/*******************************************************************************
+* Function Name  : BlueNRGHCITask
+* Description    : BlueNRG HCI Process
+* Input          : pvParameters，创建任务时传入
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void BlueNRGHCITask(void *pvParameters)
+{   
+    while(1)
+    {
+        /* Process any pending HCI events read */
+        HCI_Process();
+        vTaskDelay(100);
+    }
+}
 
-/* USER CODE END Includes */
 
-/* Variables -----------------------------------------------------------------*/
 
-/* USER CODE BEGIN Variables */
-
-/* USER CODE END Variables */
-
-/* Function prototypes -------------------------------------------------------*/
-
-/* USER CODE BEGIN FunctionPrototypes */
-
-/* USER CODE END FunctionPrototypes */
-
-/* Hook prototypes */
-
-/* USER CODE BEGIN Application */
-     
-/* USER CODE END Application */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
