@@ -55,10 +55,15 @@
 #include <stdlib.h>
 
 extern uint16_t accServHandle, freeFallCharHandle, accCharHandle;
+extern uint16_t envSensServHandle, tempCharHandle, pressCharHandle, humidityCharHandle;
 
 
 tBleStatus Add_Acc_Service(void);
 tBleStatus BlueNRG_Update_Acc(AxesRaw_t *data);
+tBleStatus Add_Environmental_Sensor_Service(void);
+tBleStatus Temp_Update(int16_t temp);
+tBleStatus Press_Update(int32_t press);
+tBleStatus Humidity_Update(uint16_t humidity);
 
 
 

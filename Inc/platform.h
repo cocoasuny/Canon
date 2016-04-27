@@ -46,6 +46,9 @@
 /* Debug Switch */
 #define PRINTFLOG
 #define Debug_BlueNRF
+#define Debug_Sensor_Humidity
+#define Debug_Sensor_Press
+#define Debug_Sensor_Temperature
 
 
 /******** Task define ********************/

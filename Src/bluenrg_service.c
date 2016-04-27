@@ -54,7 +54,7 @@
 
 
 /* Ble parameters define */
-const char *devicename = "BlueNRG";
+const char *devicename = "BlueNRG";    //DeviceMaxName:10
 uint8_t g_tx_power_level = 4;
 uint16_t service_handle, dev_name_char_handle, appearance_char_handle;
 volatile uint16_t connection_handle = 0;
@@ -171,6 +171,7 @@ tBleStatus Service_Init(void)
 
 	/**********  add  SERVICEs ***********/
 	Add_Acc_Service();
+    Add_Environmental_Sensor_Service();
 	
     return ret;
 }
@@ -262,10 +263,30 @@ static void Read_Request_CB(uint16_t handle)
     {
         BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
     }
-//	else if()
-//	{
-//	
-//	}
+    else if(handle == tempCharHandle + 1)
+    {
+        int16_t data;
+//        data = 270 + ((uint64_t)rand()*15)/RAND_MAX; //sensor emulation        
+//        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
+//                                    // If the user button is not pressed within
+//                                    // a short time after the connection,
+//                                    // a pop-up reports a "No valid characteristics found" error.
+        Temp_Update(data);
+    }
+    else if(handle == pressCharHandle + 1)
+    {
+        int32_t data;
+        
+        data = 100000 + ((uint64_t)rand()*1000)/RAND_MAX;
+        Press_Update(data);
+    }
+    else if(handle == humidityCharHandle + 1)
+    {
+        uint16_t data;
+
+        data = 450 + ((uint64_t)rand()*100)/RAND_MAX;
+        Humidity_Update(data);
+    } 
 
     
     
