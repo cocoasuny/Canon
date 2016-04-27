@@ -55,6 +55,7 @@
 
 /* Ble parameters define */
 const char *devicename = "BlueNRG";
+uint8_t g_tx_power_level = 4;
 uint16_t service_handle, dev_name_char_handle, appearance_char_handle;
 volatile uint16_t connection_handle = 0;
 
@@ -89,7 +90,7 @@ void BlueNRG_Init(void)
     getBlueNRGVersion(&hwVersion, &fwVersion);
     DLog("HWver %x, FWver %x\r\n", hwVersion, fwVersion);
 #endif
-
+    
     /* Advertising Init */
     Advertising_Init();
 
@@ -97,7 +98,7 @@ void BlueNRG_Init(void)
     Service_Init();
 
     /* Start Advertise */
-
+    Start_Advertise();
 }
 
 /*******************************************************************************
@@ -109,21 +110,9 @@ void BlueNRG_Init(void)
 *******************************************************************************/
 void Advertising_Init(void)
 {
-	uint8_t SERVER_BDADDR[] = {0x12, 0x34, 0x00, 0xE1, 0x80, 0x02};
-	uint8_t bdaddr[6];
-	tBleStatus ret = BLE_STATUS_ERROR;
-	
-	memcpy(bdaddr, SERVER_BDADDR, sizeof(SERVER_BDADDR));
-	
-	ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
-							  CONFIG_DATA_PUBADDR_LEN,
-							  bdaddr);
-#ifdef Debug_BlueNRF
-    if(ret != BLE_STATUS_SUCCESS)
-    {
-        DLog("Device Add failed...0x%x\r\n",ret);
-    }
-#endif	
+    /* Reset BlueNRG hardware */
+    BlueNRG_RST();  
+    Ble_AdvAddress_Set();
 }
 
 
@@ -137,7 +126,6 @@ void Advertising_Init(void)
 tBleStatus Service_Init(void)
 {
     tBleStatus ret;
-	const char local_name[] = {AD_TYPE_COMPLETE_LOCAL_NAME,'B','l','u','e','N','R','G'};
 
     /*gatt_Init*/
     ret = aci_gatt_init();
@@ -160,8 +148,6 @@ tBleStatus Service_Init(void)
     {
         return BLE_GAP_INIT_FAILED;
     }
-	ret = aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0,
-                                   strlen(devicename), (uint8_t *)devicename);
 	
     ret = aci_gap_set_auth_requirement(MITM_PROTECTION_REQUIRED,
                                        OOB_AUTH_DATA_ABSENT,
@@ -186,17 +172,80 @@ tBleStatus Service_Init(void)
 	/**********  add  SERVICEs ***********/
 	Add_Acc_Service();
 	
-	/* Set output power level */
-	ret = aci_hal_set_tx_power_level(1,4);
-	
+    return ret;
+}
+/*******************************************************************************
+* Function Name  : Start_Advertise
+* Description    : 开始广播
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+tBleStatus Start_Advertise(void)
+{
+    tBleStatus ret;
+    char local_name[DeviceMaxName];
+    uint8_t  device_name_len = 0,local_name_len = 0;
+    
+	ret = aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0,
+                                   strlen(devicename), (uint8_t *)devicename);  
+    
+    /* Set output power level */
+	ret = Ble_SetTx_Power(g_tx_power_level);
+    
 	/* disable scan response */
 	hci_le_set_scan_resp_data(0,NULL);
 	
+    /* Covern devicename to local_name */
+    device_name_len = strlen(devicename);
+    local_name_len = device_name_len + 1;
+    local_name[0] = AD_TYPE_COMPLETE_LOCAL_NAME;
+    memcpy(local_name+1,devicename,device_name_len);
+    
 	ret = aci_gap_set_discoverable(ADV_IND, 0, 0, PUBLIC_ADDR, NO_WHITE_LIST_USE,
-                                 sizeof(local_name), local_name, 0, NULL, 0, 0);
-  	
+                                 local_name_len, local_name, 0, NULL, 0, 0);  
 
-    return 0;
+    return ret;
+}
+/*******************************************************************************
+* Function Name  : Ble_SetTx_Power
+* Description    : 设置蓝牙发射功率
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+tBleStatus Ble_SetTx_Power(uint8_t level)
+{
+    tBleStatus ret;
+    
+    /* Set output power level */
+    ret = aci_hal_set_tx_power_level(1,level);
+
+    return ret;
+}
+/*******************************************************************************
+* Function Name  : Ble_AdvAddress_Set
+* Description    : 设置蓝牙广播地址
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+tBleStatus Ble_AdvAddress_Set(void)
+{ 
+	uint8_t bdaddr[] = {0x12, 0x34, 0x00, 0xE1, 0x80, 0x02};
+	tBleStatus ret = BLE_STATUS_ERROR;
+		
+	ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
+							  CONFIG_DATA_PUBADDR_LEN,
+							  bdaddr);
+#ifdef Debug_BlueNRF
+    if(ret != BLE_STATUS_SUCCESS)
+    {
+        DLog("Device Address failed...0x%x\r\n",ret);
+    }
+#endif
+
+    return ret;
 }
 
 /*******************************************************************************
@@ -256,6 +305,7 @@ void GAP_DisconnectionComplete_CB(void)
 //  /* Make the device connectable again. */
 //  set_connectable = TRUE;
 //  notification_enabled = FALSE;
+    Start_Advertise();
 }
 /**
  * @brief  This function is called attribute value corresponding to 

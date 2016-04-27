@@ -57,6 +57,9 @@ do {\
 #define BLE_CONNECTABLE		1
 #define BLE_NOCONNECTABLE	0
 
+/* Ble device name max lengh */
+#define DeviceMaxName       10
+
 
 typedef  struct _evt_gatt_attr_modified
 {
@@ -86,11 +89,16 @@ typedef enum
 } BLE_RoleTypeDef;
 
 
+extern uint8_t g_tx_power_level;
+
 
 void BlueNRG_Init(void);
 void Advertising_Init(void);
 void HCI_Event_CB(void *pckt);
 tBleStatus Service_Init(void);
+tBleStatus Ble_AdvAddress_Set(void);
+tBleStatus Start_Advertise(void);
+tBleStatus Ble_SetTx_Power(uint8_t level);
 
 void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle);
 void GAP_DisconnectionComplete_CB(void);

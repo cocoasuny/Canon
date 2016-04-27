@@ -50,7 +50,6 @@ UART_HandleTypeDef UartHandle;
 void Bsp_Init(void)
 {
     /* Initialize all configured peripherals */
-    HAL_DeInit();
     MX_GPIO_Init();
     UART_Init();
     MX_SDIO_SD_Init();
