@@ -266,7 +266,7 @@ static void Read_Request_CB(uint16_t handle)
     else if(handle == tempCharHandle + 1)
     {
         int16_t data;
-//        data = 270 + ((uint64_t)rand()*15)/RAND_MAX; //sensor emulation        
+        data = 270 + ((uint64_t)rand()*15)/RAND_MAX; //sensor emulation        
 //        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
 //                                    // If the user button is not pressed within
 //                                    // a short time after the connection,
