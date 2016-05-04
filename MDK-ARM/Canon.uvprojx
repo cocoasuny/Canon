@@ -365,7 +365,7 @@
               <MiscControls>--C99 --gnu</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F401xE,BLUENRG_MS</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Drivers/CMSIS/Include;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FatFs/src/drivers;../Middlewares/Third_Party/FatFs/src;../Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F4xx_HAL_Driver/Inc;../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../Drivers/CMSIS/Include;../Drivers/CMSIS/Device/ST/STM32F4xx/Include;../Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../Middlewares/Third_Party/FreeRTOS/Source/include;../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../Middlewares/Third_Party/FatFs/src/drivers;../Middlewares/Third_Party/FatFs/src;../Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes;../Drivers/Components</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -484,6 +484,11 @@
               <FilePath>..\Src\bluenrg_service.c</FilePath>
             </File>
             <File>
+              <FileName>bluenrg_sensor_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\bluenrg_sensor_service.c</FilePath>
+            </File>
+            <File>
               <FileName>platform.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\platform.h</FilePath>
@@ -492,11 +497,6 @@
               <FileName>stm32f4xx_hal_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\stm32f4xx_hal_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>bluenrg_sensor_service.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\bluenrg_sensor_service.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -517,6 +517,21 @@
               <FileName>clock.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\clock.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_hum_temp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\bsp_hum_temp.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Drivers</GroupName>
+          <Files>
+            <File>
+              <FileName>hts221.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\Components\hts221.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -989,11 +1004,6 @@
               <FilePath>..\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\controller\bluenrg_l2cap_aci.c</FilePath>
             </File>
             <File>
-              <FileName>bluenrg_utils_small.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\controller\bluenrg_utils_small.c</FilePath>
-            </File>
-            <File>
               <FileName>bluenrg_itf_template.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Middlewares\ST\STM32_BlueNRG\Interface\bluenrg_itf_template.c</FilePath>
@@ -1012,6 +1022,11 @@
               <FileName>osal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\utils\osal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bluenrg_utils_small.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\controller\bluenrg_utils_small.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -35,10 +35,40 @@
 #include "usbd_cdc_if.h"
 #include "usb_device.h"
 #include "main.h"
+#include "bsp_hum_temp.h"
 
 
+/** @defgroup bsp_Private_Variables
+ * @{
+ */
+/* uart */
 static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
-UART_HandleTypeDef UartHandle;
+static UART_HandleTypeDef UartHandle;
+
+/*I2c*/
+uint32_t I2C_EXPBD_Timeout = NUCLEO_I2C_EXPBD_TIMEOUT_MAX;    /*<! Value of Timeout when I2C communication fails */
+static I2C_HandleTypeDef    I2C_EXPBD_Handle;
+
+/* Link function for HUM_TEMP peripheral */
+HUM_TEMP_StatusTypeDef HTS221_IO_Init(void);
+void HTS221_IO_ITConfig( void );
+HUM_TEMP_StatusTypeDef HTS221_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToWrite);
+HUM_TEMP_StatusTypeDef HTS221_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                      uint16_t NumByteToRead);
+
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Init(void);
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToWrite);
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToRead);
+
+/************************************I2C**********************************************/
+static void I2C_EXPBD_MspInit(void);
+static void I2C_EXPBD_Error(uint8_t Addr);
+static HAL_StatusTypeDef I2C_EXPBD_Init(void);
+static HAL_StatusTypeDef I2C_EXPBD_WriteData(uint8_t* pBuffer, uint8_t Addr, uint8_t Reg, uint16_t Size);
+static HAL_StatusTypeDef I2C_EXPBD_ReadData(uint8_t* pBuffer, uint8_t Addr, uint8_t Reg, uint16_t Size);
 
 /*
 *********************************************************************************************************
@@ -59,6 +89,9 @@ void Bsp_Init(void)
 
     /* init code for FATFS */
     MX_FATFS_Init();  
+    
+    /* init code for humidity & temperature sensor */
+    BSP_HUM_TEMP_Init();
     
     #ifndef PRINTFLOG
         HAL_Delay(5000);
@@ -301,3 +334,244 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
 {
 	DLog("\r\nErr = 0x%x,file = %s,line = %d.\r\n",error_code,p_file_name,line_num);
 }
+
+/********************************* LINK HUM_TEMP *****************************/
+/**
+ * @brief  Configures HTS221 I2C interface
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+HUM_TEMP_StatusTypeDef HTS221_IO_Init(void)
+{
+    return HUM_TEMP_IO_Init();
+}
+
+/**
+ * @brief  Configures HTS221 interrupt lines for NUCLEO boards
+ * @retval None
+ */
+void HTS221_IO_ITConfig( void )
+{
+    /* To be implemented */
+}
+
+/**
+ * @brief  Writes a buffer to the HTS221 sensor
+ * @param  pBuffer the pointer to data to be written
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the humidity and temperature internal address register to be written
+ * @param  NumByteToWrite the number of bytes to be written
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+HUM_TEMP_StatusTypeDef HTS221_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToWrite)
+{
+    return HUM_TEMP_IO_Write(pBuffer, DeviceAddr, RegisterAddr, NumByteToWrite);
+}
+
+/**
+ * @brief  Reads a buffer from the HTS221 sensor
+ * @param  pBuffer the pointer to data to be read
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the humidity and temperature internal address register to be read
+ * @param  NumByteToRead the number of bytes to be read
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+HUM_TEMP_StatusTypeDef HTS221_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                      uint16_t NumByteToRead)
+{
+    return HUM_TEMP_IO_Read(pBuffer, DeviceAddr, RegisterAddr, NumByteToRead);
+}
+
+
+/**
+ * @brief  Configures humidity and temperature I2C interface
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Init(void)
+{
+    if(I2C_EXPBD_Init() != HAL_OK)
+    {
+        return HUM_TEMP_ERROR;
+    }
+
+    return HUM_TEMP_OK;
+}
+
+/**
+ * @brief  Writes a buffer to the humidity and temperature sensor
+ * @param  pBuffer the pointer to data to be written
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the humidity and temperature internal address register to be written
+ * @param  NumByteToWrite the number of bytes to be written
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToWrite)
+{
+    HUM_TEMP_StatusTypeDef ret_val = HUM_TEMP_OK;
+
+    /* call I2C_EXPBD Read data bus function */
+    if(I2C_EXPBD_WriteData( pBuffer, DeviceAddr, RegisterAddr, NumByteToWrite ) != HAL_OK)
+    {
+        ret_val = HUM_TEMP_ERROR;
+    }
+
+    return ret_val;
+}
+
+/**
+ * @brief  Reads a buffer from the humidity and temperature sensor
+ * @param  pBuffer the pointer to data to be read
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the humidity and temperature internal address register to be read
+ * @param  NumByteToRead the number of bytes to be read
+ * @retval HUM_TEMP_OK in case of success, an error code otherwise
+ */
+static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToRead)
+{
+    HUM_TEMP_StatusTypeDef ret_val = HUM_TEMP_OK;
+
+    /* call I2C_EXPBD Read data bus function */
+    if(I2C_EXPBD_ReadData( pBuffer, DeviceAddr, RegisterAddr, NumByteToRead ) != HAL_OK)
+    {
+        ret_val = HUM_TEMP_ERROR;
+    }
+
+    return ret_val;
+}
+
+
+/******************************* I2C Routines**********************************/
+/**
+ * @brief  Configures I2C interface
+ * @retval HAL status
+ */
+static HAL_StatusTypeDef I2C_EXPBD_Init(void)
+{
+    HAL_StatusTypeDef ret_val = HAL_OK;
+
+    if(HAL_I2C_GetState(&I2C_EXPBD_Handle) == HAL_I2C_STATE_RESET)
+    {
+        /* I2C_EXPBD peripheral configuration */
+        I2C_EXPBD_Handle.Init.ClockSpeed = NUCLEO_I2C_EXPBD_SPEED;
+        I2C_EXPBD_Handle.Init.DutyCycle = I2C_DUTYCYCLE_2;
+        I2C_EXPBD_Handle.Init.OwnAddress1 = 0x33;
+        I2C_EXPBD_Handle.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+        I2C_EXPBD_Handle.Instance = NUCLEO_I2C_EXPBD;
+
+        /* Init the I2C */
+        I2C_EXPBD_MspInit();
+        ret_val = HAL_I2C_Init(&I2C_EXPBD_Handle);
+    }
+
+    return ret_val;
+}
+
+/**
+ * @brief  Write a value in a register of the device through the bus
+ * @param  pBuffer the pointer to data to be written
+ * @param  Addr the device address on bus
+ * @param  Reg the target register address to be written
+ * @param  Size the size in bytes of the value to be written
+ * @retval HAL status
+ */
+
+static HAL_StatusTypeDef I2C_EXPBD_WriteData(uint8_t* pBuffer, uint8_t Addr, uint8_t Reg, uint16_t Size)
+{
+    HAL_StatusTypeDef status = HAL_OK;
+
+    status = HAL_I2C_Mem_Write(&I2C_EXPBD_Handle, Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Size,
+                               I2C_EXPBD_Timeout);
+
+    /* Check the communication status */
+    if(status != HAL_OK)
+    {
+        /* Execute user timeout callback */
+        I2C_EXPBD_Error(Addr);
+    }
+
+    return status;
+}
+
+
+/**
+ * @brief  Read the value of a register of the device through the bus
+ * @param  pBuffer the pointer to data to be read
+ * @param  Addr the device address on bus
+ * @param  Reg the target register address to be read
+ * @param  Size the size in bytes of the value to be read
+ * @retval HAL status.
+ */
+static HAL_StatusTypeDef I2C_EXPBD_ReadData(uint8_t* pBuffer, uint8_t Addr, uint8_t Reg, uint16_t Size)
+{
+    HAL_StatusTypeDef status = HAL_OK;
+
+    status = HAL_I2C_Mem_Read(&I2C_EXPBD_Handle, Addr, (uint16_t)Reg, I2C_MEMADD_SIZE_8BIT, pBuffer, Size,
+                              I2C_EXPBD_Timeout);
+
+    /* Check the communication status */
+    if(status != HAL_OK)
+    {
+        /* Execute user timeout callback */
+        I2C_EXPBD_Error(Addr);
+    }
+
+    return status;
+}
+
+/**
+ * @brief  Manages error callback by re-initializing I2C
+ * @param  Addr I2C Address
+ * @retval None
+ */
+static void I2C_EXPBD_Error(uint8_t Addr)
+{
+    /* De-initialize the I2C comunication bus */
+    HAL_I2C_DeInit(&I2C_EXPBD_Handle);
+
+    /*FIXME: We need to wait a while in order to have I2C that works fine after deinit */
+    HAL_Delay(1);
+
+    /* Re-Initiaize the I2C comunication bus */
+    I2C_EXPBD_Init();
+}
+
+/**
+ * @brief  I2C MSP Initialization
+ * @retval None
+ */
+
+static void I2C_EXPBD_MspInit(void)
+{
+    GPIO_InitTypeDef  GPIO_InitStruct;
+
+    /* Enable I2C GPIO clocks */
+    NUCLEO_I2C_EXPBD_SCL_SDA_GPIO_CLK_ENABLE();
+
+    /* I2C_EXPBD SCL and SDA pins configuration -------------------------------------*/
+    GPIO_InitStruct.Pin = NUCLEO_I2C_EXPBD_SCL_PIN | NUCLEO_I2C_EXPBD_SDA_PIN;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Pull  = GPIO_NOPULL;
+    GPIO_InitStruct.Alternate  = NUCLEO_I2C_EXPBD_SCL_SDA_AF;
+    HAL_GPIO_Init(NUCLEO_I2C_EXPBD_SCL_SDA_GPIO_PORT, &GPIO_InitStruct);
+
+    /* Enable the I2C_EXPBD peripheral clock */
+    NUCLEO_I2C_EXPBD_CLK_ENABLE();
+
+    /* Force the I2C peripheral clock reset */
+    NUCLEO_I2C_EXPBD_FORCE_RESET();
+
+    /* Release the I2C peripheral clock reset */
+    NUCLEO_I2C_EXPBD_RELEASE_RESET();
+
+    /* Enable and set I2C_EXPBD Interrupt to the highest priority */
+    HAL_NVIC_SetPriority(NUCLEO_I2C_EXPBD_EV_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(NUCLEO_I2C_EXPBD_EV_IRQn);
+
+    /* Enable and set I2C_EXPBD Interrupt to the highest priority */
+    HAL_NVIC_SetPriority(NUCLEO_I2C_EXPBD_ER_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(NUCLEO_I2C_EXPBD_ER_IRQn);
+}
+

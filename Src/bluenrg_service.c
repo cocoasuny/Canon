@@ -51,6 +51,7 @@
 #include "sm.h"
 #include "debug.h"
 #include <stdlib.h>
+#include "bsp_hum_temp.h"
 
 
 /* Ble parameters define */
@@ -266,11 +267,14 @@ static void Read_Request_CB(uint16_t handle)
     else if(handle == tempCharHandle + 1)
     {
         int16_t data;
-        data = 270 + ((uint64_t)rand()*15)/RAND_MAX; //sensor emulation        
+        float fTmp = 0;       
 //        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
 //                                    // If the user button is not pressed within
 //                                    // a short time after the connection,
 //                                    // a pop-up reports a "No valid characteristics found" error.
+        /* Get Temperature */
+        BSP_HUM_TEMP_GetTemperature(&fTmp);
+        data = (uint16_t)(fTmp*10);
         Temp_Update(data);
     }
     else if(handle == pressCharHandle + 1)
@@ -283,8 +287,11 @@ static void Read_Request_CB(uint16_t handle)
     else if(handle == humidityCharHandle + 1)
     {
         uint16_t data;
-
-        data = 450 + ((uint64_t)rand()*100)/RAND_MAX;
+        float fHum = 0;
+ 
+        /* Get Humidity */
+        BSP_HUM_TEMP_GetHumidity(&fHum);
+        data = (uint16_t)(fHum*10);        
         Humidity_Update(data);
     } 
 
