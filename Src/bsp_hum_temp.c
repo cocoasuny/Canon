@@ -124,7 +124,7 @@ HUM_TEMP_StatusTypeDef    BSP_HUM_TEMP_Init(void)
             Hum_tempDrv->extData = (HUM_TEMP_DrvExtTypeDef *)&Hts221Drv_ext;
             HumTempInitialized = 1;
             #ifdef Debug_Sensor_Humidity
-                printf("HTS211 Init OK\r\n");
+                printf("Humidity Sensor HTS211 Init OK\r\n");
             #endif
         }
     }

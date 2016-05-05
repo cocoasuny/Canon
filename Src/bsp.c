@@ -36,6 +36,7 @@
 #include "usb_device.h"
 #include "main.h"
 #include "bsp_hum_temp.h"
+#include "bsp_pressure.h"
 
 
 /** @defgroup bsp_Private_Variables
@@ -49,6 +50,20 @@ static UART_HandleTypeDef UartHandle;
 uint32_t I2C_EXPBD_Timeout = NUCLEO_I2C_EXPBD_TIMEOUT_MAX;    /*<! Value of Timeout when I2C communication fails */
 static I2C_HandleTypeDef    I2C_EXPBD_Handle;
 
+/* Link function for PRESSURE peripheral */
+PRESSURE_StatusTypeDef LPS25H_IO_Init(void);
+void LPS25H_IO_ITConfig( void );
+PRESSURE_StatusTypeDef LPS25HB_IO_Init(void);
+void LPS25HB_IO_ITConfig( void );
+PRESSURE_StatusTypeDef LPS25H_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToWrite);
+PRESSURE_StatusTypeDef LPS25HB_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                        uint16_t NumByteToWrite);
+PRESSURE_StatusTypeDef LPS25H_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                      uint16_t NumByteToRead);
+PRESSURE_StatusTypeDef LPS25HB_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToRead);
+                                       
 /* Link function for HUM_TEMP peripheral */
 HUM_TEMP_StatusTypeDef HTS221_IO_Init(void);
 void HTS221_IO_ITConfig( void );
@@ -57,6 +72,11 @@ HUM_TEMP_StatusTypeDef HTS221_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uin
 HUM_TEMP_StatusTypeDef HTS221_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
                                       uint16_t NumByteToRead);
 
+static PRESSURE_StatusTypeDef PRESSURE_IO_Init(void);
+static PRESSURE_StatusTypeDef PRESSURE_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToWrite);
+static PRESSURE_StatusTypeDef PRESSURE_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToRead);
 static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Init(void);
 static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
         uint16_t NumByteToWrite);
@@ -92,6 +112,9 @@ void Bsp_Init(void)
     
     /* init code for humidity & temperature sensor */
     BSP_HUM_TEMP_Init();
+    
+    /* init code for pressure sensor */
+    BSP_PRESSURE_Init();
     
     #ifndef PRINTFLOG
         HAL_Delay(5000);
@@ -334,6 +357,98 @@ void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p
 {
 	DLog("\r\nErr = 0x%x,file = %s,line = %d.\r\n",error_code,p_file_name,line_num);
 }
+/********************************* LINK PRESSURE *****************************/
+/**
+ * @brief  Configures LPS25H I2C interface
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25H_IO_Init(void)
+{
+    return PRESSURE_IO_Init();
+}
+
+/**
+ * @brief  Configures LPS25H interrupt lines for NUCLEO boards
+ * @retval None
+ */
+void LPS25H_IO_ITConfig( void )
+{
+    /* To be implemented */
+}
+
+/**
+ * @brief  Configures LPS25HB I2C interface
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25HB_IO_Init(void)
+{
+    return PRESSURE_IO_Init();
+}
+
+/**
+ * @brief  Configures LPS25HB interrupt lines for NUCLEO boards
+ * @retval None
+ */
+void LPS25HB_IO_ITConfig( void )
+{
+    /* To be implemented */
+}
+
+/**
+ * @brief  Writes a buffer to the LPS25H sensor
+ * @param  pBuffer the pointer to data to be written
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be written
+ * @param  NumByteToWrite the number of bytes to be written
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25H_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToWrite)
+{
+    return PRESSURE_IO_Write(pBuffer, DeviceAddr, RegisterAddr, NumByteToWrite);
+}
+
+/**
+ * @brief  Writes a buffer to the LPS25HB sensor
+ * @param  pBuffer the pointer to data to be written
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be written
+ * @param  NumByteToWrite the number of bytes to be written
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25HB_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                        uint16_t NumByteToWrite)
+{
+    return PRESSURE_IO_Write(pBuffer, DeviceAddr, RegisterAddr, NumByteToWrite);
+}
+
+/**
+ * @brief  Reads a buffer from the LPS25H sensor
+ * @param  pBuffer the pointer to data to be read
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be read
+ * @param  NumByteToRead the number of bytes to be read
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25H_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                      uint16_t NumByteToRead)
+{
+    return PRESSURE_IO_Read(pBuffer, DeviceAddr, RegisterAddr, NumByteToRead);
+}
+
+/**
+ * @brief  Reads a buffer from the LPS25HB sensor
+ * @param  pBuffer the pointer to data to be read
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be read
+ * @param  NumByteToRead the number of bytes to be read
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+PRESSURE_StatusTypeDef LPS25HB_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+                                       uint16_t NumByteToRead)
+{
+    return PRESSURE_IO_Read(pBuffer, DeviceAddr, RegisterAddr, NumByteToRead);
+}
 
 /********************************* LINK HUM_TEMP *****************************/
 /**
@@ -440,7 +555,63 @@ static HUM_TEMP_StatusTypeDef HUM_TEMP_IO_Read(uint8_t* pBuffer, uint8_t DeviceA
 
     return ret_val;
 }
+/**
+ * @brief  Configures pressure I2C interface
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+static PRESSURE_StatusTypeDef PRESSURE_IO_Init(void)
+{
+    if(I2C_EXPBD_Init() != HAL_OK)
+    {
+        return PRESSURE_ERROR;
+    }
 
+    return PRESSURE_OK;
+}
+
+/**
+ * @brief  Writes a buffer to the pressure sensor
+ * @param  pBuffer the pointer to data to be written
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be written
+ * @param  NumByteToWrite the number of bytes to be written
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+static PRESSURE_StatusTypeDef PRESSURE_IO_Write(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToWrite)
+{
+    PRESSURE_StatusTypeDef ret_val = PRESSURE_OK;
+
+    /* call I2C_EXPBD Read data bus function */
+    if(I2C_EXPBD_WriteData(pBuffer, DeviceAddr, RegisterAddr, NumByteToWrite) != HAL_OK)
+    {
+        ret_val = PRESSURE_ERROR;
+    }
+
+    return ret_val;
+}
+
+/**
+ * @brief  Reads a buffer from the pressure sensor
+ * @param  pBuffer the pointer to data to be read
+ * @param  DeviceAddr the slave address to be programmed
+ * @param  RegisterAddr the pressure internal address register to be read
+ * @param  NumByteToRead number of bytes to be read
+ * @retval PRESSURE_OK in case of success, an error code otherwise
+ */
+static PRESSURE_StatusTypeDef PRESSURE_IO_Read(uint8_t* pBuffer, uint8_t DeviceAddr, uint8_t RegisterAddr,
+        uint16_t NumByteToRead)
+{
+    PRESSURE_StatusTypeDef ret_val = PRESSURE_OK;
+
+    /* call I2C_EXPBD Read data bus function */
+    if(I2C_EXPBD_ReadData(pBuffer, DeviceAddr, RegisterAddr, NumByteToRead) != HAL_OK)
+    {
+        ret_val = PRESSURE_ERROR;
+    }
+
+    return ret_val;
+}
 
 /******************************* I2C Routines**********************************/
 /**

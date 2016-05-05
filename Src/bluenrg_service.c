@@ -52,6 +52,7 @@
 #include "debug.h"
 #include <stdlib.h>
 #include "bsp_hum_temp.h"
+#include "bsp_pressure.h"
 
 
 /* Ble parameters define */
@@ -280,8 +281,11 @@ static void Read_Request_CB(uint16_t handle)
     else if(handle == pressCharHandle + 1)
     {
         int32_t data;
+        float fPress = 0;
         
-        data = 100000 + ((uint64_t)rand()*1000)/RAND_MAX;
+        /* Get pressure */
+        BSP_PRESSURE_GetPressure(&fPress);
+        data = (uint32_t)(fPress*100);
         Press_Update(data);
     }
     else if(handle == humidityCharHandle + 1)

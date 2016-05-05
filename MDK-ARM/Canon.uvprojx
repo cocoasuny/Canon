@@ -523,6 +523,11 @@
               <FileType>1</FileType>
               <FilePath>..\Src\bsp_hum_temp.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_pressure.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\bsp_pressure.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -532,6 +537,16 @@
               <FileName>hts221.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Drivers\Components\hts221.c</FilePath>
+            </File>
+            <File>
+              <FileName>lps25h.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\Components\lps25h.c</FilePath>
+            </File>
+            <File>
+              <FileName>lps25hb.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Drivers\Components\lps25hb.c</FilePath>
             </File>
           </Files>
         </Group>
