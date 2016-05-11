@@ -36,6 +36,7 @@
 
 /* Global variables ----------------------------------------------------------*/
 volatile AxesRaw_t g_Axes_data = {0, 0, 0};
+uint16_t g_LedFlashTime = 100;
 
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;
@@ -132,7 +133,7 @@ void LedCtlTask(void *pvParameters)
         g_Axes_data.AXIS_Y += 100;
         g_Axes_data.AXIS_Z += 100;
         BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
-        vTaskDelay(1000);
+        vTaskDelay(g_LedFlashTime);     //øÿ÷∆LED…¡À∏∆µ¬ 
     }
 }
 

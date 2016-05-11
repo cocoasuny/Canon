@@ -57,7 +57,7 @@
 
 /* Ble parameters define */
 const char *devicename = "BlueNRG";    //DeviceMaxName:10
-uint8_t g_tx_power_level = 4;
+uint8_t g_tx_power_level = 6;
 uint16_t service_handle, dev_name_char_handle, appearance_char_handle;
 volatile uint16_t connection_handle = 0;
 
@@ -174,6 +174,7 @@ tBleStatus Service_Init(void)
 	/**********  add  SERVICEs ***********/
 	Add_Acc_Service();
     Add_Environmental_Sensor_Service();
+	Add_RemoteControl_Service();
 	
     return ret;
 }
@@ -347,12 +348,21 @@ void GAP_DisconnectionComplete_CB(void)
  * @param  Pointer to the modified attribute data
  * @retval None
  */
-void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data)
+void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data, uint8_t offset)
 {
-  /* If GATT client has modified 'LED button characteristic' value, toggle LED2 */
-//  if(handle == ledButtonCharHandle + 1){      
-//      BSP_LED_Toggle(LED2);
-//  }
+	uint8_t i = 0;
+	
+	/* If GATT client has modified 'LED Control characteristic' value, toggle LED2 */
+	if(handle == ledControlCharHandle + 1)
+	{   
+		g_LedFlashTime = att_data[0]*256 + att_data[1];
+		printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
+		for(i=0;i<data_length;i++)
+		{
+			printf("0x%x,",att_data[i]);
+		}
+		printf("\r\n");
+	}
 }
 /**
  * @brief  Callback processing the ACI events.
@@ -406,7 +416,7 @@ void HCI_Event_CB(void *pckt)
 					extract callback data and pass to suitable handler function */
 					
 					evt_gatt_attr_modified *evt = (evt_gatt_attr_modified*)blue_evt->data;
-					Attribute_Modified_CB(evt->attr_handle, evt->data_length, evt->att_data); 
+					Attribute_Modified_CB(evt->attr_handle, evt->data_length, evt->att_data,evt->offset); 
 				}
 				break; 
 

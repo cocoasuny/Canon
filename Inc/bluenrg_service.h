@@ -67,7 +67,7 @@ typedef  struct _evt_gatt_attr_modified
   uint16_t attr_handle; /**< Handle of the attribute that was modified. */
   uint8_t  data_length; /**< The length of the data */
   uint16_t  offset; /**< Offset from which the write has been performed by the peer device */
-  uint8_t  att_data[1]; /**< The new value (length is data_length) */
+  uint8_t  att_data[20]; /**< The new value (length is data_length) */
 } evt_gatt_attr_modified;
 
 /*adv parameter structure*/
@@ -102,7 +102,7 @@ tBleStatus Ble_SetTx_Power(uint8_t level);
 
 void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle);
 void GAP_DisconnectionComplete_CB(void);
-void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data);
+void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data,uint8_t offset);
 
 
 #endif /* _BLUENRG_SERVICE_H_ */

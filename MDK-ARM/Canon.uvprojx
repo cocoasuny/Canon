@@ -498,6 +498,11 @@
               <FileType>5</FileType>
               <FilePath>..\Inc\stm32f4xx_hal_conf.h</FilePath>
             </File>
+            <File>
+              <FileName>bluenrg_remotecontrol_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\bluenrg_remotecontrol_service.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
