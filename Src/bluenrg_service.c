@@ -112,7 +112,12 @@ void BlueNRG_Init(void)
 *******************************************************************************/
 void Advertising_Init(void)
 {
-    /* Reset BlueNRG hardware */
+  /* 
+   * Reset BlueNRG again otherwise we won't
+   * be able to change its MAC address.
+   * aci_hal_write_config_data() must be the first
+   * command after reset otherwise it will fail.
+   */
     BlueNRG_RST();  
     Ble_AdvAddress_Set();
 }
