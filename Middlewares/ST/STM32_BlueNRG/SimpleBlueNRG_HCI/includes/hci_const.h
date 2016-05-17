@@ -34,7 +34,7 @@
 
 typedef __packed struct _hci_uart_pckt{
   uint8_t type;
-  uint8_t data[0];
+  uint8_t data[VARIABLE_SIZE];
 } PACKED hci_uart_pckt;
 #define HCI_HDR_SIZE 1
 
@@ -47,7 +47,7 @@ typedef __packed struct _hci_command_hdr{
 typedef __packed struct _hci_event_pckt{
   uint8_t evt;
   uint8_t plen;
-  uint8_t data[0];
+  uint8_t data[VARIABLE_SIZE];
 } PACKED hci_event_pckt;
 #define HCI_EVENT_HDR_SIZE 	2
 

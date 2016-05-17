@@ -114,7 +114,7 @@ void HCI_Process(void)
     while(BlueNRG_DataPresent()) {
       data_len = BlueNRG_SPI_Read_All(&SpiHandle, buffer, HCI_READ_PACKET_SIZE);
       if(data_len > 0)
-        HCI_Event_CB(buffer);
+        HCI_Event_CB(buffer);     
     }
     readPacketListFull = FALSE;
   }

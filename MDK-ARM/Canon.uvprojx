@@ -359,7 +359,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>--C99 --gnu</MiscControls>
@@ -489,6 +489,11 @@
               <FilePath>..\Src\bluenrg_sensor_service.c</FilePath>
             </File>
             <File>
+              <FileName>bluenrg_remotecontrol_service.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\bluenrg_remotecontrol_service.c</FilePath>
+            </File>
+            <File>
               <FileName>platform.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\platform.h</FilePath>
@@ -497,11 +502,6 @@
               <FileName>stm32f4xx_hal_conf.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\Inc\stm32f4xx_hal_conf.h</FilePath>
-            </File>
-            <File>
-              <FileName>bluenrg_remotecontrol_service.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Src\bluenrg_remotecontrol_service.c</FilePath>
             </File>
           </Files>
         </Group>

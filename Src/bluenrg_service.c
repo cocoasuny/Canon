@@ -131,6 +131,12 @@ tBleStatus Service_Init(void)
 
     /*gatt_Init*/
     ret = aci_gatt_init();
+#ifdef Debug_BlueNRF
+    if(ret != BLE_STATUS_SUCCESS)
+    {
+        DLog("GATT_Init failed...0x%x\r\n",ret);
+    }
+#endif    
 
     if(ret)
     {
@@ -353,13 +359,13 @@ void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_da
 	uint8_t i = 0;
 	
 	/* If GATT client has modified 'LED Control characteristic' value, toggle LED2 */
-	if(handle == ledControlCharHandle + 1)
+	if(handle == (ledControlCharHandle + 1))
 	{   
 		g_LedFlashTime = att_data[0]*256 + att_data[1];
 		printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
 		for(i=0;i<data_length;i++)
 		{
-			printf("0x%x,",att_data[i]);
+			printf("0x%x,",*(att_data + i));
 		}
 		printf("\r\n");
 	}
