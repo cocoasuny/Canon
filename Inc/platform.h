@@ -49,6 +49,7 @@
 #define Debug_Sensor_Humidity
 #define Debug_Sensor_Press
 #define Debug_Sensor_Temperature
+#define Debug_LedControl
 
 
 /******** Task define ********************/
@@ -107,7 +108,7 @@
 #define BNRG_SPI_FIRSTBIT           SPI_FIRSTBIT_MSB
 #define BNRG_SPI_TIMODE             SPI_TIMODE_DISABLED
 #define BNRG_SPI_CRCPOLYNOMIAL      7
-#define BNRG_SPI_BAUDRATEPRESCALER  SPI_BAUDRATEPRESCALER_8
+#define BNRG_SPI_BAUDRATEPRESCALER  SPI_BAUDRATEPRESCALER_4
 #define BNRG_SPI_CRCCALCULATION     SPI_CRCCALCULATION_DISABLED
 
 // SPI Reset Pin: PB.1

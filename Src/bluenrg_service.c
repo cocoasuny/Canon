@@ -64,13 +64,11 @@ volatile uint16_t connection_handle = 0;
 /* Private function prototypes -----------------------------------------------*/
 
 
-/*
-*********************************************************************************************************
-*	∫Ø  ˝ √˚: BlueNRG_Init
-*	π¶ƒ‹Àµ√˜: BlueNRG≥ı ºªØ
-*	–Œ    ≤Œ£∫None
-*	∑µ ªÿ ÷µ: None
-*********************************************************************************************************/
+/**
+   * @brief BlueNRGÂàùÂßãÂåñ
+   * @param  None
+   * @retval None
+   */
 void BlueNRG_Init(void)
 {
 #ifdef Debug_BlueNRF
@@ -103,13 +101,11 @@ void BlueNRG_Init(void)
     Start_Advertise();
 }
 
-/*******************************************************************************
-* Function Name  : Advertising_Init
-* Description    : ¿∂—¿π„≤• ˝æ›≥ı ºªØ
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief Advertise ÂàùÂßãÂåñ
+   * @param None
+   * @retval None
+   */
 void Advertising_Init(void)
 {
   /* 
@@ -122,14 +118,11 @@ void Advertising_Init(void)
     Ble_AdvAddress_Set();
 }
 
-
-/*******************************************************************************
-* Function Name  : Service_Init
-* Description    : ∑˛ŒÒ≥ı ºªØ
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief ServicesÂàùÂßãÂåñ
+   * @param  None
+   * @retval None
+   */
 tBleStatus Service_Init(void)
 {
     tBleStatus ret;
@@ -183,13 +176,11 @@ tBleStatus Service_Init(void)
 	
     return ret;
 }
-/*******************************************************************************
-* Function Name  : Start_Advertise
-* Description    : ø™ ºπ„≤•
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief ÂºÄÂßãÂπøÊí≠
+   * @param None
+   * @retval None
+   */
 tBleStatus Start_Advertise(void)
 {
     tBleStatus ret;
@@ -216,13 +207,11 @@ tBleStatus Start_Advertise(void)
 
     return ret;
 }
-/*******************************************************************************
-* Function Name  : Ble_SetTx_Power
-* Description    : …Ë÷√¿∂—¿∑¢…‰π¶¬ 
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief Set the transmit power
+   * @param level: the power
+   * @retval None
+   */
 tBleStatus Ble_SetTx_Power(uint8_t level)
 {
     tBleStatus ret;
@@ -232,13 +221,11 @@ tBleStatus Ble_SetTx_Power(uint8_t level)
 
     return ret;
 }
-/*******************************************************************************
-* Function Name  : Ble_AdvAddress_Set
-* Description    : …Ë÷√¿∂—¿π„≤•µÿ÷∑
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief set the advertise address
+   * @param None 
+   * @retval None
+   */
 tBleStatus Ble_AdvAddress_Set(void)
 { 
 	uint8_t bdaddr[] = {0x12, 0x34, 0x00, 0xE1, 0x80, 0x02};
@@ -257,16 +244,14 @@ tBleStatus Ble_AdvAddress_Set(void)
     return ret;
 }
 
-/*******************************************************************************
-* Function Name  : Read_Request_CB
-* Description    : HCI_Event_CB÷–µ˜”√£¨App«Î«Û∂¡ ±£¨HCI_Event_CBµ˜”√¥À∫Ø ˝
-* Input          : Handle of the attribute
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+   * @brief handle the read request
+   * @param handle: the handle
+   * @retval None
+   */
 static void Read_Request_CB(uint16_t handle)
 {
-    //∏˘æ›≤ªÕ¨µƒhandleΩ¯––¥¶¿Ì(Œ™ ≤√¥º”1£ø£ø£ø£ø)
+    //Ëé∑Âèñhandle
 	if(handle == accCharHandle + 1)
     {
         BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
@@ -361,12 +346,14 @@ void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_da
 	if(handle == ledControlCharHandle + 1)
 	{   
 		g_LedFlashTime = att_data[0]*256 + att_data[1];
-		printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
-		for(i=0;i<data_length;i++)
-		{
-			printf("0x%x,",att_data[i]);
-		}
-		printf("\r\n");
+		#ifdef Debug_LedControl
+			printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
+			for(i=0;i<data_length;i++)
+			{
+				printf("0x%x,",att_data[i]);
+			}
+			printf("\r\n");
+		#endif
 	}
 }
 /**
