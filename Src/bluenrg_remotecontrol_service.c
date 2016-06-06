@@ -60,7 +60,7 @@ tBleStatus Add_RemoteControl_Service(void)
 
     /* add service */
     COPY_REMOTE_CONTROL_SERVICE_UUID(uuid);
-    ret = aci_gatt_add_serv(UUID_TYPE_128, uuid,PRIMARY_SERVICE,7,&remoteControlServHandle);
+    ret = aci_gatt_add_serv(UUID_TYPE_128, uuid,PRIMARY_SERVICE,11,&remoteControlServHandle);
     if(ret != BLE_STATUS_SUCCESS) goto fail;    
 
     /* add LED Control characteristic */

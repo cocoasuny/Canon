@@ -335,34 +335,7 @@ tBleStatus aci_gap_set_discoverable(uint8_t AdvType, uint16_t AdvIntervMin, uint
  * @param InitiatorAddr     Initiator's address (Little Endian).
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_set_direct_connectable_IDB05A1(uint8_t own_addr_type, uint8_t directed_adv_type, uint8_t initiator_addr_type, const uint8_t *initiator_addr);
-
-/**
- * @brief Set the Device in direct connectable mode (as defined in GAP specification Volume 3, Section 9.3.3).
- * @note  If the privacy is enabled, the reconnection address is used for advertising, otherwise the address
- * 		  of the type specified in OwnAddrType is used. The device will be in directed connectable mode only
- * 		  for 1.28 seconds. If no connection is established within this duration, the device enters non
- * 		  discoverable mode and advertising will have to be again enabled explicitly.
- * 		  The controller generates a @ref EVT_LE_CONN_COMPLETE event with the status set to @ref HCI_DIRECTED_ADV_TIMEOUT
- * 		  if the connection was not established and 0x00 if the connection was successfully established.
- *
- * 		  Usage example:
- * 		  @code
- *
- * 		  tBleStatus ret;
- *
- * 		  const uint8_t central_address = {0x43,0x27,0x84,0xE1,0x80,0x02};
- * 		  ret = aci_gap_set_direct_connectable_IDB04A1(PUBLIC_ADDR, PUBLIC_ADDR, central_address);
- * 		  @endcode
- *
- *
- *
- * @param OwnAddrType  Type of our address used during advertising (@ref PUBLIC_ADDR,@ref STATIC_RANDOM_ADDR).
- * @param InitiatorAddrType Type of peer address (@ref PUBLIC_ADDR,@ref STATIC_RANDOM_ADDR).
- * @param InitiatorAddr     Initiator's address (Little Endian).
- * @return Value indicating success or error code.
- */
-tBleStatus aci_gap_set_direct_connectable_IDB04A1(uint8_t own_addr_type, uint8_t initiator_addr_type, const uint8_t *initiator_addr);
+tBleStatus aci_gap_set_direct_connectable(uint8_t own_addr_type, uint8_t directed_adv_type, uint8_t initiator_addr_type, const uint8_t *initiator_addr);
 
 /**
  * @brief Set the IO capabilities of the device.
@@ -459,16 +432,8 @@ tBleStatus aci_gap_authorization_response(uint16_t conn_handle, uint8_t authoriz
  *                         @arg @ref NON_RESOLVABLE_PRIVATE_ADDR
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_set_non_connectable_IDB05A1(uint8_t adv_type, uint8_t own_address_type);
+tBleStatus aci_gap_set_non_connectable(uint8_t adv_type, uint8_t own_address_type);
 
-/**
- * @brief Put the device into non-connectable mode.
- * @param adv_type One of the allowed advertising types:
- *                 @arg @ref ADV_SCAN_IND : Scannable undirected advertising
- *                 @arg @ref ADV_NONCONN_IND : Non-connectable undirected advertising
- * @return Value indicating success or error code.
- */
-tBleStatus aci_gap_set_non_connectable_IDB04A1(uint8_t adv_type);
 
 /**
  * @brief Put the device into undirected connectable mode.
@@ -591,14 +556,7 @@ tBleStatus aci_gap_clear_security_database(void);
  * @param conn_handle 
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_allow_rebond_IDB05A1(uint16_t conn_handle);
-
-/**
- * @brief Allows the security manager to complete the pairing procedure and re-bond with the master.
- * @note This command can be issued by the application if a @ref EVT_BLUE_GAP_BOND_LOST event is generated.
- * @return Value indicating success or error code.
- */
-tBleStatus aci_gap_allow_rebond_IDB04A1(void);
+tBleStatus aci_gap_allow_rebond(uint16_t conn_handle);
 
 /**
  * @brief Start the limited discovery procedure.
@@ -764,7 +722,7 @@ tBleStatus aci_gap_start_name_discovery_proc(uint16_t scanInterval, uint16_t sca
  * 					 @endcode
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_start_auto_conn_establish_proc_IDB05A1(uint16_t scanInterval, uint16_t scanWindow,
+tBleStatus aci_gap_start_auto_conn_establish_proc(uint16_t scanInterval, uint16_t scanWindow,
 						 uint8_t own_bdaddr_type, uint16_t conn_min_interval,	
 						 uint16_t conn_max_interval, uint16_t conn_latency,	
 						 uint16_t supervision_timeout, uint16_t min_conn_length, 
@@ -772,15 +730,6 @@ tBleStatus aci_gap_start_auto_conn_establish_proc_IDB05A1(uint16_t scanInterval,
                          uint8_t num_whitelist_entries,
                          const uint8_t *addr_array);
 
-tBleStatus aci_gap_start_auto_conn_establish_proc_IDB04A1(uint16_t scanInterval, uint16_t scanWindow,
-						 uint8_t own_bdaddr_type, uint16_t conn_min_interval,	
-						 uint16_t conn_max_interval, uint16_t conn_latency,	
-						 uint16_t supervision_timeout, uint16_t min_conn_length, 
-						 uint16_t max_conn_length,
-                                                 uint8_t use_reconn_addr,
-                                                 const tBDAddr reconn_addr,
-                                                 uint8_t num_whitelist_entries,
-                                                 const uint8_t *addr_array);
 /**
  * @brief Start a general connection establishment procedure.
  * @note  The host enables scanning in the controller with the scanner filter policy set
@@ -814,11 +763,8 @@ tBleStatus aci_gap_start_auto_conn_establish_proc_IDB04A1(uint16_t scanInterval,
  *
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_start_general_conn_establish_proc_IDB05A1(uint8_t scan_type, uint16_t scan_interval, uint16_t scan_window,
+tBleStatus aci_gap_start_general_conn_establish_proc(uint8_t scan_type, uint16_t scan_interval, uint16_t scan_window,
 						 uint8_t own_address_type, uint8_t filter_duplicates);
-tBleStatus aci_gap_start_general_conn_establish_proc_IDB04A1(uint8_t scan_type, uint16_t scan_interval, uint16_t scan_window,
-						 uint8_t own_address_type, uint8_t filter_duplicates, uint8_t use_reconn_addr, const tBDAddr reconn_addr);
-
 /**
  * @brief Start a selective connection establishment procedure.
  * @note  The GAP adds the specified device addresses into white list and enables scanning in
@@ -978,17 +924,7 @@ tBleStatus aci_gap_send_pairing_request(uint16_t conn_handle, uint8_t force_rebo
  * @param[in] actual_address The public or static random address of the peer device, distributed during pairing phase.
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_resolve_private_address_IDB05A1(const tBDAddr private_address, tBDAddr actual_address);
-
-/**
- * @brief Resolve a private address.
- * @note  This command tries to resolve the address provided with the IRKs present in its database. If
- * 		  the address is resolved successfully with any one of the IRKs present in the database, it
- * 		  returns success.
- * @param address Address to be resolved.
- * @return Value indicating success or error code.
- */
-tBleStatus aci_gap_resolve_private_address_IDB04A1(const tBDAddr private_address);
+tBleStatus aci_gap_resolve_private_address(const tBDAddr private_address, tBDAddr actual_address);
 
 /**
  * @brief This command gets the list of bonded devices.
@@ -1047,7 +983,7 @@ tBleStatus aci_gap_get_bonded_devices(uint8_t *num_devices, uint8_t *device_list
  * 					 @endcode
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_set_broadcast_mode_IDB05A1(uint16_t adv_interv_min, uint16_t adv_interv_max, uint8_t adv_type,
+tBleStatus aci_gap_set_broadcast_mode(uint16_t adv_interv_min, uint16_t adv_interv_max, uint8_t adv_type,
                                       uint8_t own_addr_type, uint8_t adv_data_length, const uint8_t *adv_data,  uint8_t num_whitelist_entries,
                                       const uint8_t *addr_array);
 
@@ -1074,7 +1010,7 @@ tBleStatus aci_gap_set_broadcast_mode_IDB05A1(uint16_t adv_interv_min, uint16_t 
  * 						   @arg 0x01: Filter duplicates
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_start_observation_procedure_IDB05A1(uint16_t scan_interval, uint16_t scan_window, uint8_t scan_type,
+tBleStatus aci_gap_start_observation_procedure(uint16_t scan_interval, uint16_t scan_window, uint8_t scan_type,
 						 uint8_t own_address_type, uint8_t filter_duplicates);
 
 /**
@@ -1087,7 +1023,7 @@ tBleStatus aci_gap_start_observation_procedure_IDB05A1(uint16_t scan_interval, u
  * @param peer_address Address used by the peer device while advertising.
  * @return Value indicating success or error code.
  */
-tBleStatus aci_gap_is_device_bonded_IDB05A1(uint8_t peer_address_type, const tBDAddr peer_address);
+tBleStatus aci_gap_is_device_bonded(uint8_t peer_address_type, const tBDAddr peer_address);
 
 /**
  * @}
@@ -1200,23 +1136,11 @@ typedef __packed struct _evt_gap_procedure_complete{
  * This event is sent only by a privacy enabled Peripheral. The event is sent to the upper layers when the peripheral
  * is not able to resolve the private address of the peer device after connecting to it.
  */
-#define EVT_BLUE_GAP_ADDR_NOT_RESOLVED_IDB05A1          (0x0408)
-typedef __packed struct _evt_gap_addr_not_resolved_IDB05A1{
+#define EVT_BLUE_GAP_ADDR_NOT_RESOLVED          (0x0408)
+typedef __packed struct _evt_gap_addr_not_resolved{
   uint16_t conn_handle; /**< Connection handle for which the private address could not be resolved with any of the stored IRK's.  */
-} PACKED evt_gap_addr_not_resolved_IDB05A1;
+} PACKED evt_gap_addr_not_resolved;
 
-/**
- * This event is raised when the reconnection address is generated during the general connection
- * establishment procedure. The same address is set into the peer device also as a part of the general
- * connection establishment procedure. In order to make use of the reconnection address the next time
- * while connecting to the bonded peripheral, the application needs to use this reconnection address
- * as its own address as well as the peer address to which it wants to connect. See aci_gap_start_general_conn_establish_proc()
- * and aci_gap_start_auto_conn_establish_proc().
- */
-#define EVT_BLUE_GAP_RECONNECTION_ADDRESS_IDB04A1       (0x0408)
-typedef __packed struct _evt_gap_reconnection_addr_IDB04A1{
-  uint8_t reconnection_address[6]; /**< 6 bytes of reconnection address that has been generated */
-} PACKED evt_gap_reconnection_addr_IDB04A1;
 
 /**
  * @}

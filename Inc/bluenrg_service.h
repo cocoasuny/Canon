@@ -61,15 +61,6 @@ do {\
 #define DeviceMaxName       10
 
 
-typedef  struct _evt_gatt_attr_modified
-{
-  uint16_t conn_handle; /**< The connection handle which modified the attribute. */
-  uint16_t attr_handle; /**< Handle of the attribute that was modified. */
-  uint8_t  data_length; /**< The length of the data */
-  uint16_t  offset; /**< Offset from which the write has been performed by the peer device */
-  uint8_t  att_data[20]; /**< The new value (length is data_length) */
-} evt_gatt_attr_modified;
-
 /*adv parameter structure*/
 typedef struct
 {

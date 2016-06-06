@@ -53,8 +53,8 @@ void LedCtlTask(void *pvParameters);
 
 
 /*******************************************************************************
-* Function Name  : mainº¯Êı
-* Description    : mainº¯Êı 
+* Function Name  : mainå‡½æ•°
+* Description    : mainå‡½æ•°
 * Input          : None
 * Output         : None
 * Return         : None
@@ -79,21 +79,21 @@ int main(void)
 
     /* Led Control Task */
     xTaskCreate(
-                LedCtlTask,                 //ÈÎÎñº¯Êı
-                "LedCtl",                   //ÈÎÎñÃû
-                500,                        //stack´óĞ¡£¬µ¥Î»word£¬Ò²¾ÍÊÇ4×Ö½Ú
-                NULL,                       //ÈÎÎñ²ÎÊı
-                1,                          //ÈÎÎñÓÅÏÈ¼¶
-                &xHandleLedCtl);            //ÈÎÎñ¾ä±ú
+                LedCtlTask,                 //ä»»åŠ¡å‡½æ•°
+				"LedCtl",                   //ä»»åŠ¡åç§°
+                500,                        //stackå¤§å°ï¼Œå•ä½word
+                NULL,                       //ä»»åŠ¡å‚æ•°
+                1,                          //ä»»åŠ¡ä¼˜å…ˆçº§
+                &xHandleLedCtl);            //ä»»åŠ¡å¥æŸ„
                 
     /* BlueNRG HCI Task */
     xTaskCreate(
-                BlueNRGHCITask,             //ÈÎÎñº¯Êı
-                "BlueHCI",                  //ÈÎÎñÃû
-                Task_BlueNRGHCI_Stack,      //stack´óĞ¡£¬µ¥Î»word£¬Ò²¾ÍÊÇ4×Ö½Ú
-                NULL,                       //ÈÎÎñ²ÎÊı
-                Task_BlueNRGHCI_Priority,   //ÈÎÎñÓÅÏÈ¼¶
-                &xHandleBlueNRGHCI);        //ÈÎÎñ¾ä±ú                
+                BlueNRGHCITask,             //ä»»åŠ¡å‡½æ•°
+                "BlueHCI",                  //ä»»åŠ¡åç§°
+                Task_BlueNRGHCI_Stack,      //stackå¤§å°ï¼Œå•ä½word
+                NULL,                       //ä»»åŠ¡å‚æ•°
+                Task_BlueNRGHCI_Priority,   //ä»»åŠ¡ä¼˜å…ˆçº§
+                &xHandleBlueNRGHCI);        //ä»»åŠ¡å¥æŸ„           
                 
     /* Start scheduler */
     vTaskStartScheduler();
@@ -114,8 +114,8 @@ int main(void)
 
 /*******************************************************************************
 * Function Name  : LedCtlTask
-* Description    : ¿ØÖÆLed
-* Input          : pvParameters£¬´´½¨ÈÎÎñÊ±´«Èë
+* Description    : æ§åˆ¶LED
+* Input          : pvParametersï¼Œåˆ›å»ºä»»åŠ¡æ—¶ä¼ å…¥å‚æ•°
 * Output         : None
 * Return         : None
 *******************************************************************************/
@@ -132,7 +132,7 @@ void LedCtlTask(void *pvParameters)
         g_Axes_data.AXIS_Y += 100;
         g_Axes_data.AXIS_Z += 100;
         BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
-        vTaskDelay(g_LedFlashTime);     //¿ØÖÆLEDÉÁË¸ÆµÂÊ
+        vTaskDelay(g_LedFlashTime);     //æ§åˆ¶LDEé—ªçƒé¢‘ç‡
     }
 }
 
