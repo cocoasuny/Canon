@@ -307,14 +307,15 @@ static void Read_Request_CB(uint16_t handle)
  */
 void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 {  
-//  connected = TRUE;
-  connection_handle = handle;
-  
-//  PRINTF("Connected to device:");
-//  for(int i = 5; i > 0; i--){
-//    PRINTF("%02X-", addr[i]);
-//  }
-//  PRINTF("%02X\n", addr[0]);
+	//  connected = TRUE;
+	connection_handle = handle;
+
+	printf("Connected to device:");
+	for(int i = 5; i > 0; i--)
+	{
+		printf("%02X-", addr[i]);
+	}
+	printf("%02X\r\n", addr[0]);
 }
 /**
  * @brief  This function is called when the peer device gets disconnected.
@@ -324,7 +325,7 @@ void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 void GAP_DisconnectionComplete_CB(void)
 {
 //  connected = FALSE;
-//  PRINTF("Disconnected\n");
+	printf("Disconnected\r\n");
 //  /* Make the device connectable again. */
 //  set_connectable = TRUE;
 //  notification_enabled = FALSE;
