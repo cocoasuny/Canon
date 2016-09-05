@@ -170,7 +170,7 @@ tBleStatus Service_Init(void)
     }
 
 	/**********  add  SERVICEs ***********/
-	Add_Acc_Service();
+	Add_Motion_Sensor_Service();
     Add_Environmental_Sensor_Service();
 	Add_RemoteControl_Service();
 	
@@ -252,7 +252,7 @@ tBleStatus Ble_AdvAddress_Set(void)
 static void Read_Request_CB(uint16_t handle)
 {
     //获取handle
-	if(handle == accCharHandle + 1)
+	if(handle == lsm6ds3AccCharHandle + 1)
     {
         BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
     }

@@ -52,13 +52,13 @@
 #include "debug.h"
 #include "global_typedef.h"
 
-#include <stdlib.h>
+#include <stdlib.h> 
 
-extern uint16_t accServHandle, freeFallCharHandle, accCharHandle;
+extern uint16_t motionSensServHandle, lsm6ds3FreeFallCharHandle, lsm6ds3AccCharHandle;
 extern uint16_t envSensServHandle, tempCharHandle, pressCharHandle, humidityCharHandle;
 
 
-tBleStatus Add_Acc_Service(void);
+tBleStatus Add_Motion_Sensor_Service(void);
 tBleStatus BlueNRG_Update_Acc(AxesRaw_t *data);
 tBleStatus Add_Environmental_Sensor_Service(void);
 tBleStatus Temp_Update(int16_t temp);

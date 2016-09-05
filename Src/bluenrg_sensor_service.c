@@ -38,7 +38,7 @@
 
 
 /* accelerometer service and char UUID define */
-#define COPY_ACC_SERVICE_UUID(uuid_struct)  COPY_UUID_128(uuid_struct,0x02,0x36,0x6e,0x80, 0xcf,0x3a, 0x11,0xe1, 0x9a,0xb4, 0x00,0x02,0xa5,0xd5,0xc5,0x1b)
+#define COPY_MOTION_SEN_SERVICE_UUID(uuid_struct)  COPY_UUID_128(uuid_struct,0x02,0x36,0x6e,0x80, 0xcf,0x3a, 0x11,0xe1, 0x9a,0xb4, 0x00,0x02,0xa5,0xd5,0xc5,0x1b)
 #define COPY_FREE_FALL_UUID(uuid_struct)    COPY_UUID_128(uuid_struct,0xe2,0x3e,0x78,0xa0, 0xcf,0x4a, 0x11,0xe1, 0x8f,0xfc, 0x00,0x02,0xa5,0xd5,0xc5,0x1b)
 #define COPY_ACC_UUID(uuid_struct)          COPY_UUID_128(uuid_struct,0x34,0x0a,0x1b,0x80, 0xcf,0x4b, 0x11,0xe1, 0xac,0x36, 0x00,0x02,0xa5,0xd5,0xc5,0x1b)
 
@@ -49,42 +49,39 @@
 #define COPY_HUMIDITY_CHAR_UUID(uuid_struct)     COPY_UUID_128(uuid_struct,0x01,0xc5,0x0b,0x60, 0xe4,0x8c, 0x11,0xe2, 0xa0,0x73, 0x00,0x02,0xa5,0xd5,0xc5,0x1b)
 
 /* variables ---------------------------------------------------------*/
-uint16_t accServHandle, freeFallCharHandle, accCharHandle;
+uint16_t motionSensServHandle, lsm6ds3FreeFallCharHandle, lsm6ds3AccCharHandle;
 uint16_t envSensServHandle, tempCharHandle, pressCharHandle, humidityCharHandle;
 
-
-/*******************************************************************************
-* Function Name  : Add_Acc_Service
-* Description    : 添加三轴传感器服务
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-tBleStatus Add_Acc_Service(void)
+/**
+ * @brief  Add Motion Sensor Service
+ * @param[in]  None
+ * @retval status
+ */
+tBleStatus Add_Motion_Sensor_Service(void)
 {
     tBleStatus ret;
 
     uint8_t uuid[16];
 
-    /* add service */
-    COPY_ACC_SERVICE_UUID(uuid);
-    ret = aci_gatt_add_serv(UUID_TYPE_128, uuid,PRIMARY_SERVICE,7,&accServHandle);
+    /* add motion sensor service */
+    COPY_MOTION_SEN_SERVICE_UUID(uuid);
+    ret = aci_gatt_add_serv(UUID_TYPE_128, uuid,PRIMARY_SERVICE,7,&motionSensServHandle);
     if(ret != BLE_STATUS_SUCCESS) goto fail;    
 
-    /* add Free Fall characteristic */
+    /* add LSM6DS3 Free Fall characteristic */
     COPY_FREE_FALL_UUID(uuid);
-    ret = aci_gatt_add_char(accServHandle, UUID_TYPE_128, uuid, 1,
+    ret = aci_gatt_add_char(motionSensServHandle, UUID_TYPE_128, uuid, 1,
                            CHAR_PROP_NOTIFY, ATTR_PERMISSION_NONE, 0,
-                           16, 0, &freeFallCharHandle);
+                           16, 0, &lsm6ds3FreeFallCharHandle);
     if (ret != BLE_STATUS_SUCCESS) goto fail;
 
     /* add accelerometer characteristic */
     COPY_ACC_UUID(uuid);  
-    ret =  aci_gatt_add_char(accServHandle, UUID_TYPE_128, uuid, 6,
+    ret =  aci_gatt_add_char(motionSensServHandle, UUID_TYPE_128, uuid, 6,
                            CHAR_PROP_NOTIFY|CHAR_PROP_READ,
                            ATTR_PERMISSION_NONE,
                            GATT_NOTIFY_READ_REQ_AND_WAIT_FOR_APPL_RESP,
-                           16, 0, &accCharHandle);
+                           16, 0, &lsm6ds3AccCharHandle);
     if (ret != BLE_STATUS_SUCCESS) goto fail;
 
     return BLE_STATUS_SUCCESS; 
@@ -111,7 +108,7 @@ tBleStatus BlueNRG_Update_Acc(AxesRaw_t *data)
     STORE_LE_16(buff+2,data->AXIS_Y);
     STORE_LE_16(buff+4,data->AXIS_Z);
 
-    ret = aci_gatt_update_char_value(accServHandle, accCharHandle, 0, sizeof(buff), buff);
+    ret = aci_gatt_update_char_value(motionSensServHandle, lsm6ds3AccCharHandle, 0, sizeof(buff), buff);
 
     if (ret != BLE_STATUS_SUCCESS)
     {
