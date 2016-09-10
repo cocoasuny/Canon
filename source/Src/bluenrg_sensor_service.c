@@ -117,13 +117,11 @@ tBleStatus BlueNRG_Update_Acc(AxesRaw_t *data)
     return ret;	
 }
 
-/*******************************************************************************
-* Function Name  : Add_Environmental_Sensor_Service
-* Description    : Ìí¼Ó»·¾³´«¸ĞÆ÷·şÎñ£ºÎÂ¶È¡¢ÆøÑ¹¡¢Êª¶È
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+/**
+  * @brief  å¢åŠ ç¯å¢ƒä¼ æ„Ÿå™¨æœåŠ¡
+  * @param  None
+  * @retval status    
+  */
 tBleStatus Add_Environmental_Sensor_Service(void)
 {
     tBleStatus ret;
