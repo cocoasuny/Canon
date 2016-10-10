@@ -250,6 +250,10 @@ void Shell_Invalid_Service(void)
 		{
 			Sys_SoftReset();
 		}
+		else if(StrComp(ptSrc,"who are you\r\n"))
+		{
+			printf("I'm a Periphral device\r\n");
+		}
         else goto ERROR_LOOP;
     }
     else

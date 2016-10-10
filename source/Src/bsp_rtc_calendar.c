@@ -124,7 +124,7 @@ void Calendar_Set(RTC_DateTypeDef *date_s,RTC_TimeTypeDef *rtc_time)
     week_str_typedef        m_rtc_week;
     
     /* Convent the date to week */
-    Calendar_WeekDayNum(&sdatestructure, &m_rtc_week);
+    Calendar_WeekDayNum(date_s, &m_rtc_week);
     
     /* Get the date and time */
     sdatestructure.Year = date_s->Year;
