@@ -56,10 +56,11 @@
 
 
 /* Ble parameters define */
-const char *devicename = "BlueNRG";    //DeviceMaxName:10
-uint8_t g_tx_power_level = 6;
-uint16_t service_handle, dev_name_char_handle, appearance_char_handle;
-volatile uint16_t connection_handle = 0;
+const char 			*devicename = "BlueNRG";    //DeviceMaxName:10
+uint8_t 			g_tx_power_level = 6;
+uint16_t 			service_handle, dev_name_char_handle, appearance_char_handle;
+volatile uint16_t 	connection_handle = 0;
+static uint8_t 		bdaddr[6] = {0};
 
 /* Private function prototypes -----------------------------------------------*/
 
@@ -71,11 +72,6 @@ volatile uint16_t connection_handle = 0;
    */
 void BlueNRG_Init(void)
 {
-#ifdef Debug_BlueNRF
-    uint8_t  hwVersion;
-    uint16_t fwVersion;
-#endif
-
     /* Initialize the BlueNRG SPI driver */
     BNRG_SPI_Init();
 
@@ -84,13 +80,7 @@ void BlueNRG_Init(void)
 
     /* Reset BlueNRG hardware */
     BlueNRG_RST();
-
-#ifdef Debug_BlueNRF
-    /* get the BlueNRG HW and FW versions */
-    getBlueNRGVersion(&hwVersion, &fwVersion);
-//    printf("HWver %x, FWver %x\r\n", hwVersion, fwVersion);
-#endif
-    
+		    
     /* Advertising Init */
     Advertising_Init();
 
@@ -108,14 +98,45 @@ void BlueNRG_Init(void)
    */
 void Advertising_Init(void)
 {
-  /* 
-   * Reset BlueNRG again otherwise we won't
-   * be able to change its MAC address.
-   * aci_hal_write_config_data() must be the first
-   * command after reset otherwise it will fail.
-   */
-    BlueNRG_RST();  
-    Ble_AdvAddress_Set();
+#ifdef Debug_BlueNRF
+    uint8_t  hwVersion;
+    uint16_t fwVersion;
+#endif
+	int 			ret = 0;
+	
+    /* get the BlueNRG HW and FW versions */
+    getBlueNRGVersion(&hwVersion, &fwVersion);
+#ifdef Debug_BlueNRF
+    printf("HWver %x, FWver %x\r\n", hwVersion, fwVersion);
+#endif
+
+	/* Reset BlueNRG again otherwise it will fail. */
+	BlueNRG_RST();
+	
+	/* Create a Unique BLE MAC */
+	{
+		bdaddr[0] = (STM32_UUID[1]>>24)&0xFF;
+		bdaddr[1] = (STM32_UUID[0]    )&0xFF;
+		bdaddr[2] = (STM32_UUID[2] >>8)&0xFF;
+		bdaddr[3] = (STM32_UUID[0]>>16)&0xFF;
+		
+		/* if IDB05A1 = Number between 100->199
+		 * if IDB04A1 = Number between 0->99
+		 * where Y == (OSX_BMS_VERSION_MAJOR + OSX_BMS_VERSION_MINOR)&0xF */
+		bdaddr[4] = (hwVersion > 0x30) ?
+			 ((((OSX_BMS_VERSION_MAJOR-48)*10) + (OSX_BMS_VERSION_MINOR-48)+100)&0xFF) :
+			 ((((OSX_BMS_VERSION_MAJOR-48)*10) + (OSX_BMS_VERSION_MINOR-48)    )&0xFF) ;
+		bdaddr[5] = 0xC0; /* for a Legal BLE Random MAC */
+	}
+	ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
+									CONFIG_DATA_PUBADDR_LEN,
+									bdaddr);
+#ifdef Debug_BlueNRF
+	if(ret != 0)
+	{
+		printf("Setting Pubblic BD_ADDR failed\r\n");
+	}
+#endif		
 }
 
 /**
@@ -136,16 +157,20 @@ tBleStatus Service_Init(void)
     }
 
     ret = aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
-
-#ifdef Debug_BlueNRF
     if(ret != BLE_STATUS_SUCCESS)
     {
-        printf("GAP_Init failed...0x%x\r\n",ret);
+		#ifdef Debug_BlueNRF
+			printf("GAP_Init failed...0x%x\r\n",ret);
+		#endif		
+        return BLE_GAP_INIT_FAILED;
     }
-#endif
-
-    if(ret != BLE_STATUS_SUCCESS)
+	
+	ret = hci_le_set_random_address(bdaddr);
+    if(ret != 0)
     {
+		#ifdef Debug_BlueNRF
+			printf("Setting the Static Random BD_ADDR failed\r\n");
+		#endif		
         return BLE_GAP_INIT_FAILED;
     }
 	
@@ -157,15 +182,11 @@ tBleStatus Service_Init(void)
                                        USE_FIXED_PIN_FOR_PAIRING,
                                        123456,
                                        BONDING);
-#ifdef Debug_BlueNRF
-//    if (ret == BLE_STATUS_SUCCESS)
-//    {
-//        printf("BLE Stack Initialized.\r\n");
-//    }
-#endif
-
     if (ret != BLE_STATUS_SUCCESS)
     {
+		#ifdef Debug_BlueNRF
+			printf("BLE Stack Initialized.\r\n");
+		#endif		
         return BLE_STACK_INIT_FAILED;
     }
 
@@ -183,28 +204,57 @@ tBleStatus Service_Init(void)
    */
 tBleStatus Start_Advertise(void)
 {
-    tBleStatus ret;
-    char local_name[DeviceMaxName];
-    uint8_t  device_name_len = 0,local_name_len = 0;
+    tBleStatus 			ret;
+    const char 			local_name[DeviceMaxName] = {AD_TYPE_COMPLETE_LOCAL_NAME,NAME_BLUEMS};
+	const char 			BoardName[8] = {NAME_BLUEMS,0};
+	uint8_t 			manuf_data[26] = {
+											2,0x0A,0x00 /* 0 dBm */, // Trasmission Power
+											8,0x09,NAME_BLUEMS, // Complete Name
+											13,0xFF,0x01/*SKD version */,
+											0x80,
+											0x00, /* */
+											0xE0, /* ACC+Gyro+Mag*/
+											0x00, /*  */
+											0x00, /*  */
+											0x00, /* BLE MAC start */
+											0x00,
+											0x00,
+											0x00,
+											0x00,
+											0x00, /* BLE MAC stop */
+										  };
+	/* BLE MAC */
+	manuf_data[20] = bdaddr[5];
+	manuf_data[21] = bdaddr[4];
+	manuf_data[22] = bdaddr[3];
+	manuf_data[23] = bdaddr[2];
+	manuf_data[24] = bdaddr[1];
+	manuf_data[25] = bdaddr[0];
+
+	manuf_data[16] |= 0x20; /* Led */
+	manuf_data[17] |= 0x04; /* One Temperature value*/
+	manuf_data[17] |= 0x08; /* Humidity */		
+	manuf_data[17] |= 0x10; /* Pressure value*/	
+    manuf_data[18] |=0x04;  /* Accelerometer Events */
+    manuf_data[18] |= 0x01; /* Sensor Fusion */
+	manuf_data[19] |= 0x10; /* ActivityRec */
+	manuf_data[19] |= 0x08;	/* CarryPosRec */
+	manuf_data[19] |= 0x02; /* Gesture Rec */
+	manuf_data[19] |= 0x01; /* Pedometer */
     
 	ret = aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0,
-                                   strlen(devicename), (uint8_t *)devicename);  
+                                   strlen(BoardName), (uint8_t *)BoardName);  
     
     /* Set output power level */
 	ret = Ble_SetTx_Power(g_tx_power_level);
     
 	/* disable scan response */
-	hci_le_set_scan_resp_data(0,NULL);
+	hci_le_set_scan_resp_data(0,NULL);  
+	ret = aci_gap_set_discoverable(ADV_IND, 0, 0, STATIC_RANDOM_ADDR, NO_WHITE_LIST_USE,
+                                 sizeof(local_name), local_name, 0, NULL, 0, 0);  
+	/* Send Advertising data */
+	aci_gap_update_adv_data(26, manuf_data);
 	
-    /* Covern devicename to local_name */
-    device_name_len = strlen(devicename);
-    local_name_len = device_name_len + 1;
-    local_name[0] = AD_TYPE_COMPLETE_LOCAL_NAME;
-    memcpy(local_name+1,devicename,device_name_len);
-    
-	ret = aci_gap_set_discoverable(ADV_IND, 0, 0, PUBLIC_ADDR, NO_WHITE_LIST_USE,
-                                 local_name_len, local_name, 0, NULL, 0, 0);  
-
     return ret;
 }
 /**

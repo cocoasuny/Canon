@@ -52,6 +52,16 @@
 #define Debug_LedControl
 
 
+/* Package Version only numbers 0->9 */
+#define OSX_BMS_VERSION_MAJOR '3'
+#define OSX_BMS_VERSION_MINOR '1'
+#define OSX_BMS_VERSION_PATCH '1'
+
+/* Define the BlueMicrosystem Name MUST be 7 char long */
+#define NAME_BLUEMS 'B','M','1','V',OSX_BMS_VERSION_MAJOR,OSX_BMS_VERSION_MINOR,OSX_BMS_VERSION_PATCH
+#define STM32_UUID ((uint32_t *)0x1FFF7A10)
+
+
 /* Shell Switch */
 #define SHELL_ENABLE    //Shell使能
 #define RTC_SHELL       //注释掉屏蔽RTC Shell功能

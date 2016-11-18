@@ -58,7 +58,7 @@ do {\
 #define BLE_NOCONNECTABLE	0
 
 /* Ble device name max lengh */
-#define DeviceMaxName       10
+#define DeviceMaxName       8
 
 
 /*adv parameter structure*/
