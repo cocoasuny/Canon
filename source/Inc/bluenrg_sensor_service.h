@@ -54,18 +54,62 @@
 
 #include <stdlib.h> 
 
-extern uint16_t motionSensServHandle, lsm6ds3FreeFallCharHandle, lsm6ds3AccCharHandle;
-extern uint16_t envSensServHandle, tempCharHandle, pressCharHandle, humidityCharHandle;
+
+/* For enabling the capability to handle BlueNRG Congestion */
+#define ACC_BLUENRG_CONGESTION
+
+#ifdef ACC_BLUENRG_CONGESTION
+/* For defining how many events skip when there is a congestion */
+#define ACC_BLUENRG_CONGESTION_SKIP 30
+#endif /* ACC_BLUENRG_CONGESTION */
 
 
-tBleStatus Add_Motion_Sensor_Service(void);
-tBleStatus BlueNRG_Update_Acc(AxesRaw_t *data);
-tBleStatus Add_Environmental_Sensor_Service(void);
-tBleStatus Temp_Update(int16_t temp);
-tBleStatus Press_Update(int32_t press);
-tBleStatus Humidity_Update(uint16_t humidity);
+/* For enabling MotionCP integration */
+#define OSX_BMS_MOTIONCP
+
+/* For enabling MotionAR integration */
+#define OSX_BMS_MOTIONAR
+
+/* For enabling MotionGR integration */
+#define OSX_BMS_MOTIONGR
+
+/* For enabling MotionPM integration */
+#define OSX_BMS_MOTIONPM
+
+/* Define The transmission interval in Multiple of 10ms for quaternions*/
+#define QUAT_UPDATE_MUL_10MS 3
+
+/* Define How Many quaterions you want to trasmit (from 1 to 3) */
+#define SEND_N_QUATERNIONS 3
+
+/* Define the Max dimesion of the Bluetooth characteristics
+for each packet used for Console Service */
+#define W2ST_CONSOLE_MAX_CHAR_LEN 20
+
+/* Define the symbol used for defining each termination string
+used in Console service */
+#define W2ST_CONSOLE_END_STRING "\0"
 
 
+/* function declare */
+tBleStatus Add_HWServW2ST_Service(void);
+tBleStatus AccGyroMag_Update(SensorAxes_t *Acc,SensorAxes_t *Gyro,SensorAxes_t *Mag);
+tBleStatus Environmental_Update(int32_t Press,uint16_t Hum,int16_t Temp2,int16_t Temp1);
+tBleStatus LED_Update(uint8_t LedStatus);
+tBleStatus GG_Update(void);
+tBleStatus Add_SWServW2ST_Service(void);
+tBleStatus Quat_Update(SensorAxes_t *data);
+//tBleStatus ActivityRec_Update(osx_MAR_output_t ActivityCode);
+//tBleStatus CarryPosRec_Update(osx_MCP_output_t CarryPositionCode);
+//tBleStatus GestureRec_Update(osx_MGR_output_t GestureCode);
+//tBleStatus AccPedo_Update(osx_MPM_output_t *PM_Data);
+tBleStatus Calib_Notify(uint32_t Feature,uint8_t Command,uint8_t val);
+tBleStatus Config_Notify(uint32_t Feature,uint8_t Command,uint8_t data);
+tBleStatus AccEvent_Notify(uint16_t Command);
+tBleStatus Add_ConsoleW2ST_Service(void);
+tBleStatus Stderr_Update(uint8_t *data,uint8_t length);
+tBleStatus Term_Update(uint8_t *data,uint8_t length);
+tBleStatus Add_ConfigW2ST_Service(void);
 
 #endif /* __BLUENRG_SENSOR_SERVICE_H */
 

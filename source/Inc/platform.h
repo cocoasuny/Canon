@@ -59,7 +59,7 @@
 
 /* Define the BlueMicrosystem Name MUST be 7 char long */
 #define NAME_BLUEMS 'B','M','1','V',OSX_BMS_VERSION_MAJOR,OSX_BMS_VERSION_MINOR,OSX_BMS_VERSION_PATCH
-#define STM32_UUID ((uint32_t *)0x1FFF7A10)
+#define STM32_UUID ((uint32_t *)0x1FFF7590)
 
 
 /* Shell Switch */

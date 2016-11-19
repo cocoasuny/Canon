@@ -47,7 +47,51 @@ typedef struct {
   int AXIS_Y;
   int AXIS_Z;
 } AxesRaw_t;
+/**
+ * @brief  Sensor axes raw data structure definition
+ */
+typedef struct
+{
+  int16_t AXIS_X;
+  int16_t AXIS_Y;
+  int16_t AXIS_Z;
+} SensorAxesRaw_t;
 
+/**
+ * @brief  Sensor axes data structure definition
+ */
+typedef struct
+{
+  int32_t AXIS_X;
+  int32_t AXIS_Y;
+  int32_t AXIS_Z;
+} SensorAxes_t;
+
+
+
+/**
+ * @brief  Sensor output data rate enumerator definition
+ */
+typedef enum
+{
+  ODR_LOW,
+  ODR_MID_LOW,
+  ODR_MID,
+  ODR_MID_HIGH,
+  ODR_HIGH
+} SensorOdr_t;
+
+
+
+/**
+ * @brief  Sensor full scale enumerator definition
+ */
+typedef enum
+{
+  FS_LOW,
+  FS_MID,
+  FS_HIGH
+} SensorFs_t;
 
 
 #endif /* __GLOBALTYPEDEF_H */

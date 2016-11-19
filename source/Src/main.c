@@ -139,7 +139,7 @@ void LedCtlTask(void *pvParameters)
         g_Axes_data.AXIS_X += 100;
         g_Axes_data.AXIS_Y += 100;
         g_Axes_data.AXIS_Z += 100;
-        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
+//        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
         vTaskDelay(g_LedFlashTime);     //控制LDE闪烁频率
     }
 }

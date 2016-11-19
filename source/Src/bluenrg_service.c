@@ -123,9 +123,7 @@ void Advertising_Init(void)
 		/* if IDB05A1 = Number between 100->199
 		 * if IDB04A1 = Number between 0->99
 		 * where Y == (OSX_BMS_VERSION_MAJOR + OSX_BMS_VERSION_MINOR)&0xF */
-		bdaddr[4] = (hwVersion > 0x30) ?
-			 ((((OSX_BMS_VERSION_MAJOR-48)*10) + (OSX_BMS_VERSION_MINOR-48)+100)&0xFF) :
-			 ((((OSX_BMS_VERSION_MAJOR-48)*10) + (OSX_BMS_VERSION_MINOR-48)    )&0xFF) ;
+		bdaddr[4] = (((OSX_BMS_VERSION_MAJOR-48)*10) + (OSX_BMS_VERSION_MINOR-48)+100)&0xFF;
 		bdaddr[5] = 0xC0; /* for a Legal BLE Random MAC */
 	}
 	ret = aci_hal_write_config_data(CONFIG_DATA_PUBADDR_OFFSET,
@@ -191,9 +189,40 @@ tBleStatus Service_Init(void)
     }
 
 	/**********  add  SERVICEs ***********/
-	Add_Motion_Sensor_Service();
-    Add_Environmental_Sensor_Service();
-	Add_RemoteControl_Service();
+	ret = Add_HWServW2ST_Service();
+	if(ret != BLE_STATUS_SUCCESS) 
+	{
+		#ifdef Debug_BlueNRF
+			printf("Error while adding HW Service W2ST\r\n");
+		#endif
+		return BLE_STATUS_ERROR;
+	}
+
+	ret = Add_SWServW2ST_Service();
+	if(ret != BLE_STATUS_SUCCESS)
+	{
+		#ifdef Debug_BlueNRF
+			printf("Error while adding SW Service W2ST\r\n");
+		#endif
+		return BLE_STATUS_ERROR;
+	}
+
+	ret = Add_ConsoleW2ST_Service();
+	if(ret != BLE_STATUS_SUCCESS)
+	{
+		#ifdef Debug_BlueNRF
+			printf("\r\nError while adding Console Service W2ST\r\n");
+		#endif
+		return BLE_STATUS_ERROR;
+	}	
+	
+	ret = Add_ConfigW2ST_Service();
+	if(ret == BLE_STATUS_SUCCESS)
+	{
+		#ifdef Debug_BlueNRF
+			printf("\r\nError while adding Config Service W2ST\r\n");
+		#endif
+	}	
 	
     return ret;
 }
@@ -211,7 +240,7 @@ tBleStatus Start_Advertise(void)
 											2,0x0A,0x00 /* 0 dBm */, // Trasmission Power
 											8,0x09,NAME_BLUEMS, // Complete Name
 											13,0xFF,0x01/*SKD version */,
-											0x80,
+											0x02,
 											0x00, /* */
 											0xE0, /* ACC+Gyro+Mag*/
 											0x00, /*  */
@@ -232,10 +261,11 @@ tBleStatus Start_Advertise(void)
 	manuf_data[25] = bdaddr[0];
 
 	manuf_data[16] |= 0x20; /* Led */
+	manuf_data[17] |= 0x02; /* Battery Present */										  
 	manuf_data[17] |= 0x04; /* One Temperature value*/
 	manuf_data[17] |= 0x08; /* Humidity */		
 	manuf_data[17] |= 0x10; /* Pressure value*/	
-    manuf_data[18] |=0x04;  /* Accelerometer Events */
+    manuf_data[18] |= 0x04;  /* Accelerometer Events */
     manuf_data[18] |= 0x01; /* Sensor Fusion */
 	manuf_data[19] |= 0x10; /* ActivityRec */
 	manuf_data[19] |= 0x08;	/* CarryPosRec */
@@ -302,51 +332,51 @@ tBleStatus Ble_AdvAddress_Set(void)
 static void Read_Request_CB(uint16_t handle)
 {
     //获取handle
-	if(handle == lsm6ds3AccCharHandle + 1)
-    {
-        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
-    }
-    else if(handle == tempCharHandle + 1)
-    {
-        int16_t data;
-        float fTmp = 0;       
-//        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
-//                                    // If the user button is not pressed within
-//                                    // a short time after the connection,
-//                                    // a pop-up reports a "No valid characteristics found" error.
-        /* Get Temperature */
-        BSP_HUM_TEMP_GetTemperature(&fTmp);
-        data = (uint16_t)(fTmp*10);
-        Temp_Update(data);
-    }
-    else if(handle == pressCharHandle + 1)
-    {
-        int32_t data;
-        float fPress = 0;
-        
-        /* Get pressure */
-        BSP_PRESSURE_GetPressure(&fPress);
-        data = (uint32_t)(fPress*100);
-        Press_Update(data);
-    }
-    else if(handle == humidityCharHandle + 1)
-    {
-        uint16_t data;
-        float fHum = 0;
- 
-        /* Get Humidity */
-        BSP_HUM_TEMP_GetHumidity(&fHum);
-        data = (uint16_t)(fHum*10);        
-        Humidity_Update(data);
-    } 
+//	if(handle == lsm6ds3AccCharHandle + 1)
+//    {
+//        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
+//    }
+//    else if(handle == tempCharHandle + 1)
+//    {
+//        int16_t data;
+//        float fTmp = 0;       
+////        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
+////                                    // If the user button is not pressed within
+////                                    // a short time after the connection,
+////                                    // a pop-up reports a "No valid characteristics found" error.
+//        /* Get Temperature */
+//        BSP_HUM_TEMP_GetTemperature(&fTmp);
+//        data = (uint16_t)(fTmp*10);
+//        Temp_Update(data);
+//    }
+//    else if(handle == pressCharHandle + 1)
+//    {
+//        int32_t data;
+//        float fPress = 0;
+//        
+//        /* Get pressure */
+//        BSP_PRESSURE_GetPressure(&fPress);
+//        data = (uint32_t)(fPress*100);
+//        Press_Update(data);
+//    }
+//    else if(handle == humidityCharHandle + 1)
+//    {
+//        uint16_t data;
+//        float fHum = 0;
+// 
+//        /* Get Humidity */
+//        BSP_HUM_TEMP_GetHumidity(&fHum);
+//        data = (uint16_t)(fHum*10);        
+//        Humidity_Update(data);
+//    } 
 
-    
-    
-    //Exit:
-    if(connection_handle != 0) 
-    {
-        aci_gatt_allow_read(connection_handle);
-    }
+//    
+//    
+//    //Exit:
+//    if(connection_handle != 0) 
+//    {
+//        aci_gatt_allow_read(connection_handle);
+//    }
 }
 
 /**
@@ -394,18 +424,18 @@ void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_da
 	uint8_t i = 0;
 	
 	/* If GATT client has modified 'LED Control characteristic' value, toggle LED2 */
-	if(handle == ledControlCharHandle + 1)
-	{   
-		g_LedFlashTime = att_data[0]*256 + att_data[1];
-		#ifdef Debug_LedControl
-			printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
-			for(i=0;i<data_length;i++)
-			{
-				printf("0x%x,",att_data[i]);
-			}
-			printf("\r\n");
-		#endif
-	}
+//	if(handle == ledControlCharHandle + 1)
+//	{   
+//		g_LedFlashTime = att_data[0]*256 + att_data[1];
+//		#ifdef Debug_LedControl
+//			printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
+//			for(i=0;i<data_length;i++)
+//			{
+//				printf("0x%x,",att_data[i]);
+//			}
+//			printf("\r\n");
+//		#endif
+//	}
 }
 /**
  * @brief  Callback processing the ACI events.
