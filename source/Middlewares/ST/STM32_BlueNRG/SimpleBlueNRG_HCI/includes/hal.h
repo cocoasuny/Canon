@@ -23,7 +23,11 @@
 #include <hal_types.h>
 #include <ble_status.h>
 
-
+#if defined  (STM32L1XX_MD) || (STM32L1XX_XL) 
+#include "SDK_EVAL_Config.h"
+#else
+#include "bluenrg_interface.h"
+#endif
 /******************************************************************************
  * Macros
  *****************************************************************************/
@@ -98,9 +102,9 @@ void Enable_SPI_IRQ(void);
  */
 void Disable_SPI_IRQ(void);
 
-void Hal_Init_Timer(void);
-uint32_t Hal_Get_Timer_Value(void);
-void Hal_Start_Timer(uint32_t timeout);
-void Hal_Stop_Timer(void);
+//void Hal_Init_Timer();
+//uint32_t Hal_Get_Timer_Value();
+//void Hal_Start_Timer(uint32_t timeout);
+//void Hal_Stop_Timer();
 
 #endif /* __HAL_H__ */

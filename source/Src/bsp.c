@@ -56,6 +56,7 @@ const char Dev_Msg[] =
 static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
 UART_HandleTypeDef huart1;
 static UART_HandleTypeDef huart2;
+static uint8_t	ledStatus = OFF;
 
 /*I2c*/
 uint32_t I2C_EXPBD_Timeout = NUCLEO_I2C_EXPBD_TIMEOUT_MAX;    /*<! Value of Timeout when I2C communication fails */
@@ -205,6 +206,7 @@ void BSP_LED_Init(void)
 void BSP_LED_On(void )
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_SET); 
+	ledStatus = ON;
 }
 
 /**
@@ -219,6 +221,7 @@ void BSP_LED_On(void )
 void BSP_LED_Off(void)
 {
     HAL_GPIO_WritePin(GPIOB, GPIO_PIN_3, GPIO_PIN_RESET); 
+	ledStatus = OFF;
 }
 
 /**
@@ -233,6 +236,22 @@ void BSP_LED_Off(void)
 void BSP_LED_Toggle(void)
 {
     HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_3);
+	if(ledStatus == ON)
+	{
+		ledStatus = OFF;
+	}
+	else
+	{
+		ledStatus = ON;
+	}
+}
+/**
+  * @brief  Get led status
+  * @param  *status
+  */
+void BSP_LED_Status_Get(uint8_t *status)
+{
+	*status = ledStatus;
 }
 
 /*

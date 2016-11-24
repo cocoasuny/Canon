@@ -498,11 +498,6 @@
               <FileType>5</FileType>
               <FilePath>..\source\Inc\stm32f4xx_hal_conf.h</FilePath>
             </File>
-            <File>
-              <FileName>bluenrg_remotecontrol_service.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\Src\bluenrg_remotecontrol_service.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1059,16 +1054,6 @@
               <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\controller\bluenrg_l2cap_aci.c</FilePath>
             </File>
             <File>
-              <FileName>bluenrg_itf_template.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\Interface\bluenrg_itf_template.c</FilePath>
-            </File>
-            <File>
-              <FileName>bluenrglist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\utils\bluenrglist.c</FilePath>
-            </File>
-            <File>
               <FileName>gp_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\utils\gp_timer.c</FilePath>
@@ -1077,6 +1062,16 @@
               <FileName>osal.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\utils\osal.c</FilePath>
+            </File>
+            <File>
+              <FileName>bluenrglist.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\utils\bluenrglist.c</FilePath>
+            </File>
+            <File>
+              <FileName>hci_le.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\hci_le.c</FilePath>
             </File>
             <File>
               <FileName>bluenrg_utils_small.c</FileName>

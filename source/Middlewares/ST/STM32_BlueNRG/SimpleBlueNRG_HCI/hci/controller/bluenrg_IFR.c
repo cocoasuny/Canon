@@ -4,6 +4,7 @@
 #include "ble_status.h"
 #include "bluenrg_updater_aci.h"
 #include "bluenrg_utils.h"
+#include "SDK_EVAL_Spi_Driver.h"
 
 /************** Do not change this define section ************/
 
@@ -41,15 +42,15 @@
 #define STACK_MODE              2
 #define SLAVE_SCA_PPM           100
 #define MASTER_SCA              MASTER_SCA_100ppm
-#define HS_STARTUP_TIME_US      512
-#define DAY                     11
-#define MONTH                   02
-#define YEAR                    15
+#define HS_STARTUP_TIME_US      800
+#define DAY                     13
+#define MONTH                   06
+#define YEAR                    16
 /************************************************************/
 
 /*
  * IMPORTANT!
- * This IFR configurations are only for BlueNRG Firmware v6.4 and 7.1.
+ * This IFR configurations are only for BlueNRG Firmware v6.4 and 7.x.
  */
 
 #if BLUENRG_CONFIG == BLUENRG_32_MHZ

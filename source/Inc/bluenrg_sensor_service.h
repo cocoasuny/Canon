@@ -49,7 +49,6 @@
 #include "hci.h"
 #include "hal.h"
 #include "sm.h"
-#include "debug.h"
 #include "global_typedef.h"
 
 #include <stdlib.h> 
@@ -91,6 +90,42 @@ used in Console service */
 #define W2ST_CONSOLE_END_STRING "\0"
 
 
+/* variables declare */
+extern uint16_t HWServW2STHandle;
+extern uint16_t EnvironmentalCharHandle;
+extern uint16_t AccGyroMagCharHandle;
+extern uint16_t AccEventCharHandle;
+extern uint16_t LedCharHandle;
+extern uint16_t GGCharHandle;
+
+extern uint16_t SWServW2STHandle;
+extern uint16_t QuaternionsCharHandle;
+
+#ifdef OSX_BMS_MOTIONAR
+extern uint16_t ActivityRecCharHandle;
+#endif /* OSX_BMS_MOTIONAR */
+
+#ifdef OSX_BMS_MOTIONCP
+extern uint16_t CarryPosRecCharHandle;
+#endif /* OSX_BMS_MOTIONCP */
+
+#ifdef OSX_BMS_MOTIONGR
+extern uint16_t GestureRecCharHandle;
+#endif /* OSX_BMS_MOTIONGR */
+
+#ifdef OSX_BMS_MOTIONPM
+extern uint16_t AccPedoCharHandle;
+#endif /* OSX_BMS_MOTIONPM */
+
+extern uint16_t ConfigServW2STHandle;
+extern uint16_t ConfigCharHandle;
+
+extern uint16_t ConsoleW2STHandle;
+extern uint16_t TermCharHandle;
+extern uint16_t StdErrCharHandle;
+
+
+
 /* function declare */
 tBleStatus Add_HWServW2ST_Service(void);
 tBleStatus AccGyroMag_Update(SensorAxes_t *Acc,SensorAxes_t *Gyro,SensorAxes_t *Mag);
@@ -110,6 +145,8 @@ tBleStatus Add_ConsoleW2ST_Service(void);
 tBleStatus Stderr_Update(uint8_t *data,uint8_t length);
 tBleStatus Term_Update(uint8_t *data,uint8_t length);
 tBleStatus Add_ConfigW2ST_Service(void);
+tBleStatus Term_Update_AfterRead(void);
+tBleStatus Stderr_Update_AfterRead(void);
 
 #endif /* __BLUENRG_SENSOR_SERVICE_H */
 

@@ -1,5 +1,5 @@
 /******************** (C) COPYRIGHT 2012 STMicroelectronics ********************
-* File Name          : list.h
+* File Name          : bluenrglist.h
 * Author             : AMS - HEA&RF BU
 * Version            : V1.0.0
 * Date               : 19-July-2012
@@ -16,8 +16,8 @@
 #define _BLUENRGLIST_H_
 
 typedef struct _tListNode {
-	struct _tListNode * next;
-	struct _tListNode * prev;
+  struct _tListNode * next;
+  struct _tListNode * prev;
 }tListNode, *pListNode;
 
 void list_init_head (tListNode * listHead);

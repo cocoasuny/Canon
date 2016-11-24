@@ -16,18 +16,6 @@
 #ifndef __BLUENRG_L2CAP_ACI_H__
 #define __BLUENRG_L2CAP_ACI_H__
 
-/** @addtogroup Middlewares
- *  @{
- */
-
-/** @defgroup ST
- *  @{
- */
- 
-/** @defgroup SimpleBlueNRG_HCI
- *  @{
- */
- 
 /**
  *@addtogroup L2CAP L2CAP
  *@brief L2CAP layer.
@@ -66,23 +54,33 @@ tBleStatus aci_l2cap_connection_parameter_update_request(uint16_t conn_handle, u
  * @param interval_max The maximum connection interval parameter as received in the l2cap connection update request event.
  * @param slave_latency The slave latency parameter as received in the l2cap connection update request event.
  * @param timeout_multiplier The supervision connection timeout parameter as received in the l2cap connection update request event.
+ * @cond BLUENRG_MS
  * @param min_ce_length Minimum length of connection event needed for the LE connection.\n
  * 						Range: 0x0000 - 0xFFFF\n
  * 						Time = N x 0.625 msec.
  * @param max_ce_length Maximum length of connection event needed for the LE connection.\n
  * 						Range: 0x0000 - 0xFFFF\n
  * 						Time = N x 0.625 msec.
+ * @endcond
  * @param id Identifier received in @ref EVT_BLUE_L2CAP_CONN_UPD_REQ event.
  * @param accept @arg 0x00: The connection update parameters are not acceptable.
  *               @arg 0x01: The connection update parameters are acceptable.
  * @return Value indicating success or error code.
  */
+#if BLUENRG_MS
+///@cond BLUENRG_MS
 tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, uint16_t interval_min,
 							 uint16_t interval_max, uint16_t slave_latency,
 							 uint16_t timeout_multiplier, uint16_t min_ce_length, uint16_t max_ce_length,
                                                          uint8_t id, uint8_t accept);
-
-
+///@endcond
+#else
+///@cond BLUENRG
+tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, uint16_t interval_min,
+							 uint16_t interval_max, uint16_t slave_latency,
+							 uint16_t timeout_multiplier, uint8_t id, uint8_t accept);
+///@endcond
+#endif
 
 /**
  * @}
@@ -120,6 +118,10 @@ typedef __packed struct _evt_l2cap_conn_upd_resp{
  * within 30 seconds.
  */
 #define EVT_BLUE_L2CAP_PROCEDURE_TIMEOUT      (0x0801)
+typedef __packed struct _evt_l2cap_procedure_timeout{
+  uint16_t conn_handle;         /**< The connection handle related to the event. */
+  uint8_t  event_data_length;  /**< Length of following data. It should be always 0 for this event. */
+} PACKED evt_l2cap_procedure_timeout;
 
 /**
  * The event is given by the L2CAP layer when a connection update request is received from the slave.
@@ -155,16 +157,5 @@ typedef __packed struct _evt_l2cap_conn_upd_req{
  * @}
  */
 
- /**
- * @}
- */
-
-/**
- * @}
- */
-
-/**
- * @}
- */
 
 #endif /* __BLUENRG_L2CAP_ACI_H__ */

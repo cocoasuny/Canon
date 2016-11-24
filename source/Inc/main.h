@@ -52,12 +52,17 @@
 #include "bluenrg_service.h"
 #include "freertostask.h"
 #include "bluenrg_sensor_service.h"
-#include "bluenrg_remotecontrol_service.h"
 #include "global_typedef.h"
 #include "shell.h"
 #include "bsp_rtc_calendar.h"
 #include "Log.h"
 
+/* Exported macro ------------------------------------------------------------*/
+#define MCR_BLUEMS_F2I_1D(in, out_int, out_dec) {out_int = (int32_t)in; out_dec= (int32_t)((in-out_int)*10);};
+#define MCR_BLUEMS_F2I_2D(in, out_int, out_dec) {out_int = (int32_t)in; out_dec= (int32_t)((in-out_int)*100);};
+
+#define ON		(1)
+#define OFF		(0)
 
 extern volatile AxesRaw_t g_Axes_data;
 extern uint16_t g_LedFlashTime;

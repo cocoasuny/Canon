@@ -27,19 +27,19 @@
 #define MAX(a,b)            ((a) > (b) )? (a) : (b)
 
 tBleStatus aci_l2cap_connection_parameter_update_request(uint16_t conn_handle, uint16_t interval_min,
-							 uint16_t interval_max, uint16_t slave_latency,
-							 uint16_t timeout_multiplier)
+                                                         uint16_t interval_max, uint16_t slave_latency,
+                                                         uint16_t timeout_multiplier)
 {
   struct hci_request rq;
   uint8_t status;
   l2cap_conn_param_update_req_cp cp;
-
+  
   cp.conn_handle = htobs(conn_handle);
   cp.interval_min = htobs(interval_min);
   cp.interval_max = htobs(interval_max);
   cp.slave_latency = htobs(slave_latency);
   cp.timeout_multiplier = htobs(timeout_multiplier);
-
+  
   Osal_MemSet(&rq, 0, sizeof(rq));
   rq.ogf = OGF_VENDOR_CMD;
   rq.ocf = OCF_L2CAP_CONN_PARAM_UPDATE_REQ;
@@ -48,22 +48,23 @@ tBleStatus aci_l2cap_connection_parameter_update_request(uint16_t conn_handle, u
   rq.event = EVT_CMD_STATUS;
   rq.rparam = &status;
   rq.rlen = 1;
-
+  
   if (hci_send_req(&rq, FALSE) < 0)
     return BLE_STATUS_TIMEOUT;
   
   return status;  
 }
 
+#if BLUENRG_MS
 tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, uint16_t interval_min,
-							 uint16_t interval_max, uint16_t slave_latency,
-							 uint16_t timeout_multiplier, uint16_t min_ce_length, uint16_t max_ce_length,
-                             uint8_t id, uint8_t accept)
+                                                          uint16_t interval_max, uint16_t slave_latency,
+                                                          uint16_t timeout_multiplier, uint16_t min_ce_length, uint16_t max_ce_length,
+                                                          uint8_t id, uint8_t accept)
 {
   struct hci_request rq;
   uint8_t status;
   l2cap_conn_param_update_resp_cp cp;
-
+  
   cp.conn_handle = htobs(conn_handle);
   cp.interval_min = htobs(interval_min);
   cp.interval_max = htobs(interval_max);
@@ -73,7 +74,7 @@ tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, 
   cp.max_ce_length = htobs(max_ce_length);
   cp.id = id;
   cp.accept = accept;
-
+  
   Osal_MemSet(&rq, 0, sizeof(rq));
   rq.ogf = OGF_VENDOR_CMD;
   rq.ocf = OCF_L2CAP_CONN_PARAM_UPDATE_RESP;
@@ -81,10 +82,40 @@ tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, 
   rq.clen = sizeof(cp);
   rq.rparam = &status;
   rq.rlen = 1;
-
+  
   if (hci_send_req(&rq, FALSE) < 0)
     return BLE_STATUS_TIMEOUT;
-
+  
   return status;
 }
-
+#else
+tBleStatus aci_l2cap_connection_parameter_update_response(uint16_t conn_handle, uint16_t interval_min,
+                                                          uint16_t interval_max, uint16_t slave_latency,
+                                                          uint16_t timeout_multiplier, uint8_t id, uint8_t accept)
+{
+  struct hci_request rq;
+  uint8_t status;
+  l2cap_conn_param_update_resp_cp cp;
+  
+  cp.conn_handle = htobs(conn_handle);
+  cp.interval_min = htobs(interval_min);
+  cp.interval_max = htobs(interval_max);
+  cp.slave_latency = htobs(slave_latency);
+  cp.timeout_multiplier = htobs(timeout_multiplier);
+  cp.id = id;
+  cp.accept = accept;
+  
+  Osal_MemSet(&rq, 0, sizeof(rq));
+  rq.ogf = OGF_VENDOR_CMD;
+  rq.ocf = OCF_L2CAP_CONN_PARAM_UPDATE_RESP;
+  rq.cparam = &cp;
+  rq.clen = sizeof(cp);
+  rq.rparam = &status;
+  rq.rlen = 1;
+  
+  if (hci_send_req(&rq, FALSE) < 0)
+    return BLE_STATUS_TIMEOUT;
+  
+  return status;
+}
+#endif

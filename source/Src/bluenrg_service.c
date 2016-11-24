@@ -49,14 +49,12 @@
 #include "hci.h"
 #include "hal.h"
 #include "sm.h"
-#include "debug.h"
 #include <stdlib.h>
 #include "bsp_hum_temp.h"
 #include "bsp_pressure.h"
 
 
 /* Ble parameters define */
-const char 			*devicename = "BlueNRG";    //DeviceMaxName:10
 uint8_t 			g_tx_power_level = 6;
 uint16_t 			service_handle, dev_name_char_handle, appearance_char_handle;
 volatile uint16_t 	connection_handle = 0;
@@ -151,7 +149,7 @@ tBleStatus Service_Init(void)
 
     if(ret)
     {
-        return BLE_GATT_INIT_FAILED;
+//        return BLE_GATT_INIT_FAILED;
     }
 
     ret = aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
@@ -160,7 +158,7 @@ tBleStatus Service_Init(void)
 		#ifdef Debug_BlueNRF
 			printf("GAP_Init failed...0x%x\r\n",ret);
 		#endif		
-        return BLE_GAP_INIT_FAILED;
+//        return BLE_GAP_INIT_FAILED;
     }
 	
 	ret = hci_le_set_random_address(bdaddr);
@@ -169,7 +167,7 @@ tBleStatus Service_Init(void)
 		#ifdef Debug_BlueNRF
 			printf("Setting the Static Random BD_ADDR failed\r\n");
 		#endif		
-        return BLE_GAP_INIT_FAILED;
+//        return BLE_GAP_INIT_FAILED;
     }
 	
     ret = aci_gap_set_auth_requirement(MITM_PROTECTION_REQUIRED,
@@ -185,7 +183,7 @@ tBleStatus Service_Init(void)
 		#ifdef Debug_BlueNRF
 			printf("BLE Stack Initialized.\r\n");
 		#endif		
-        return BLE_STACK_INIT_FAILED;
+//        return BLE_STACK_INIT_FAILED;
     }
 
 	/**********  add  SERVICEs ***********/
@@ -332,51 +330,96 @@ tBleStatus Ble_AdvAddress_Set(void)
 static void Read_Request_CB(uint16_t handle)
 {
     //获取handle
-//	if(handle == lsm6ds3AccCharHandle + 1)
-//    {
-//        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
-//    }
-//    else if(handle == tempCharHandle + 1)
-//    {
-//        int16_t data;
-//        float fTmp = 0;       
-////        Acc_Update((AxesRaw_t*)&axes_data); //FIXME: to overcome issue on Android App
-////                                    // If the user button is not pressed within
-////                                    // a short time after the connection,
-////                                    // a pop-up reports a "No valid characteristics found" error.
-//        /* Get Temperature */
-//        BSP_HUM_TEMP_GetTemperature(&fTmp);
-//        data = (uint16_t)(fTmp*10);
-//        Temp_Update(data);
-//    }
-//    else if(handle == pressCharHandle + 1)
-//    {
-//        int32_t data;
-//        float fPress = 0;
-//        
-//        /* Get pressure */
-//        BSP_PRESSURE_GetPressure(&fPress);
-//        data = (uint32_t)(fPress*100);
-//        Press_Update(data);
-//    }
-//    else if(handle == humidityCharHandle + 1)
-//    {
-//        uint16_t data;
-//        float fHum = 0;
-// 
-//        /* Get Humidity */
-//        BSP_HUM_TEMP_GetHumidity(&fHum);
-//        data = (uint16_t)(fHum*10);        
-//        Humidity_Update(data);
-//    } 
+	
+	if(handle == EnvironmentalCharHandle + 1)
+	{
+		/* Read Request for Pressure,Humidity, and Temperatures*/
+		float 			SensorValue;
+		int32_t 		PressToSend=0;
+		uint16_t 		HumToSend=0;
+		int16_t 		Temp2ToSend=0,Temp1ToSend=0;
+		int32_t 		decPart, intPart;
 
-//    
-//    
-//    //Exit:
-//    if(connection_handle != 0) 
-//    {
-//        aci_gatt_allow_read(connection_handle);
-//    }
+		/* pressure */
+		BSP_PRESSURE_GetPressure((float *)&SensorValue);
+		MCR_BLUEMS_F2I_2D(SensorValue, intPart, decPart);
+		PressToSend=intPart*100+decPart;
+				
+
+		/* humidity */
+		BSP_HUM_TEMP_GetHumidity((float *)&SensorValue);
+		MCR_BLUEMS_F2I_1D(SensorValue, intPart, decPart);
+		HumToSend = intPart*10+decPart;
+
+		/* temperature */
+		BSP_HUM_TEMP_GetTemperature((float *)&SensorValue);
+		MCR_BLUEMS_F2I_1D(SensorValue, intPart, decPart);
+		Temp1ToSend = intPart*10+decPart; 
+
+		Environmental_Update(PressToSend,HumToSend,Temp2ToSend,Temp1ToSend);
+	} 
+	else if(handle == LedCharHandle + 1)
+	{
+		uint8_t ledStatus;
+		BSP_LED_Status_Get(&ledStatus);
+		/* Read Request for Led Status */
+		LED_Update(ledStatus);
+	} 
+	else if(handle == AccEventCharHandle +1)
+	{
+		/* Read Request for Acc Pedometer DS3 */
+		uint16_t StepCount;
+//		StepCount = GetStepHWPedometer();
+		
+		AccEvent_Notify(StepCount);
+	#ifdef OSX_BMS_MOTIONPM
+	}
+	else if(handle == AccPedoCharHandle + 1)
+	{
+		/* Read Request for osxMotionPM */
+//		AccPedo_Update(&PM_DataOUT);
+		#endif /* OSX_BMS_MOTIONPM */
+	}
+	else if (handle == StdErrCharHandle + 1)
+	{
+		/* Send again the last packet for StdError */
+		Stderr_Update_AfterRead();
+	} 
+	else if (handle == TermCharHandle + 1) 
+	{
+		/* Send again the last packet for Terminal */
+		Term_Update_AfterRead();
+		#ifdef OSX_BMS_MOTIONAR
+	}
+	else if(handle == ActivityRecCharHandle + 1)
+	{
+//		ActivityRec_Update(ActivityCode);
+		#endif /* OSX_BMS_MOTIONAR */
+		#ifdef OSX_BMS_MOTIONCP
+	}
+	else if(handle == CarryPosRecCharHandle + 1)
+	{
+//		CarryPosRec_Update(CarryPositionCode);
+		#endif /* OSX_BMS_MOTIONCP */
+		#ifdef OSX_BMS_MOTIONGR
+	}
+	else if(handle == GestureRecCharHandle + 1)
+	{
+//		GestureRec_Update(GestureRecognitionCode);
+		#endif /* OSX_BMS_MOTIONGR */
+		#ifdef STM32_SENSORTILE
+	}
+	else if(handle == GGCharHandle + 1)
+	{
+		GG_Update();
+		#endif /* STM32_SENSORTILE */
+	}
+
+	//EXIT:
+	if(connection_handle != 0)
+	{
+		aci_gatt_allow_read(connection_handle);
+	}
 }
 
 /**
@@ -421,7 +464,7 @@ void GAP_DisconnectionComplete_CB(void)
  */
 void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data, uint8_t offset)
 {
-	uint8_t i = 0;
+//	uint8_t i = 0;
 	
 	/* If GATT client has modified 'LED Control characteristic' value, toggle LED2 */
 //	if(handle == ledControlCharHandle + 1)

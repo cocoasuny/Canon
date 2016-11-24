@@ -19,18 +19,6 @@
 #include "compiler.h"
 #include "ble_status.h"
 
-/** @addtogroup Middlewares
- *  @{
- */
-
-/** @defgroup ST
- *  @{
- */
- 
-/** @defgroup SimpleBlueNRG_HCI
- *  @{
- */
- 
 /**
  *@addtogroup GATT GATT
  *@{
@@ -230,14 +218,12 @@ typedef __packed struct _charactFormat {
  * @}
  */
 
- /**
- * @}
- */
-
 /**
- * @}
+ * @name Update type of aci_gatt_upd_char_val_ext().
+ * @{
  */
-
+#define NOTIFICATION         1
+#define INDICATION           2
 /**
  * @}
  */

@@ -20,18 +20,6 @@
 
 #include <ble_status.h>
 
-/** @addtogroup Middlewares
- *  @{
- */
-
-/** @defgroup ST
- *  @{
- */
- 
-/** @defgroup SimpleBlueNRG_HCI
- *  @{
- */
- 
 /**
  *@addtogroup GAP GAP
  *@brief API for GAP layer.
@@ -104,7 +92,7 @@ typedef	uint8_t	tBDAddr[6];
 #define ADV_SCAN_IND    (0x02)
 
 /**
- * non-connectable and no scan response (used for passive scan)
+ * non-connectable and no scan response
  */
 #define ADV_NONCONN_IND (0x03)
 
@@ -168,17 +156,6 @@ typedef	uint8_t	tBDAddr[6];
 /**
  * @}
  */
- 
-/**
- * @}
- */
 
-/**
- * @}
- */
-
-/**
- * @}
- */
 
 #endif /* _LINK_LAYER_H */

@@ -1,4 +1,3 @@
-
 #include "hal.h"
 #include "hal_types.h"
 #include "ble_status.h"
@@ -7,6 +6,7 @@
 #include "hci.h"
 #include "osal.h"
 #include "string.h"
+#include "hci_le.h"
 
 uint8_t getBlueNRGVersion(uint8_t *hwVersion, uint16_t *fwVersion)
 {
@@ -28,3 +28,6 @@ uint8_t getBlueNRGVersion(uint8_t *hwVersion, uint16_t *fwVersion)
 
   return status;
 }
+
+
+

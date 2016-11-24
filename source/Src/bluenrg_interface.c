@@ -37,7 +37,6 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "bluenrg_interface.h"
-#include "debug.h"
 #include "ble_status.h"
 #include "gp_timer.h"
 #include "hci.h"

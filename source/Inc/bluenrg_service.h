@@ -41,6 +41,7 @@
 
 #include "stm32f4xx_hal.h"
 #include "ble_status.h"
+#include "hci_le.h"
 
 
 /* Private macros ------------------------------------------------------------*/

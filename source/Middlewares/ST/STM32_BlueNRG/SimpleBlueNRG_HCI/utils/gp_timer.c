@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004, Swedish Institute of Computer Science.
+ * Copyright (c) STMicrolectronics
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,9 +26,6 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * This file is part of the Contiki operating system.
- *
- * Author: Adam Dunkels <adam@sics.se>
  *
  */
 
@@ -130,26 +127,7 @@ Timer_Remaining(struct timer *t)
   return t->start + t->interval - Clock_Time();
 }
 /*---------------------------------------------------------------------------*/
-#ifdef __DMA_LP__
 
-tBleStatus Blue_NRG_HCI_Timer_Start(uint32_t expiryTime,
-                                    TIMER_HCI_TIMEOUT_NOTIFY_CALLBACK_TYPE timercb,
-                                    uint8_t *timerID)
-{
-  TIMER_Create(eTimerModuleID_BlueNRG_HCI, timerID, eTimerMode_SingleShot,
-               (pf_TIMER_TimerCallBack_t) timercb);
-  TIMER_Start(*timerID, expiryTime*1000/TIMERSERVER_TICK_VALUE);
-  
-  return (BLE_STATUS_SUCCESS);
-}
+/** @} */
 
-/*---------------------------------------------------------------------------*/
-tBleStatus Blue_NRG_HCI_Timer_Stop(uint8_t timerID)
-{
-  TIMER_Delete(timerID);
-  
-  return (BLE_STATUS_SUCCESS);
-}
 
-#endif /* __DMA_LP__ */
-/*---------------------------------------------------------------------------*/

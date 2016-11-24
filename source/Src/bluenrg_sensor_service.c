@@ -144,38 +144,38 @@ tBleStatus safe_aci_gatt_update_char_value(uint16_t servHandle,
 #endif /* ACC_BLUENRG_CONGESTION */
 
 /* variables ---------------------------------------------------------*/
-static uint16_t HWServW2STHandle;
-static uint16_t EnvironmentalCharHandle;
-static uint16_t AccGyroMagCharHandle;
-static uint16_t AccEventCharHandle;
-static uint16_t LedCharHandle;
-static uint16_t GGCharHandle;
+uint16_t HWServW2STHandle;
+uint16_t EnvironmentalCharHandle;
+uint16_t AccGyroMagCharHandle;
+uint16_t AccEventCharHandle;
+uint16_t LedCharHandle;
+uint16_t GGCharHandle;
 
-static uint16_t SWServW2STHandle;
-static uint16_t QuaternionsCharHandle;
+uint16_t SWServW2STHandle;
+uint16_t QuaternionsCharHandle;
 
 #ifdef OSX_BMS_MOTIONAR
-static uint16_t ActivityRecCharHandle;
+uint16_t ActivityRecCharHandle;
 #endif /* OSX_BMS_MOTIONAR */
 
 #ifdef OSX_BMS_MOTIONCP
-static uint16_t CarryPosRecCharHandle;
+uint16_t CarryPosRecCharHandle;
 #endif /* OSX_BMS_MOTIONCP */
 
 #ifdef OSX_BMS_MOTIONGR
-static uint16_t GestureRecCharHandle;
+uint16_t GestureRecCharHandle;
 #endif /* OSX_BMS_MOTIONGR */
 
 #ifdef OSX_BMS_MOTIONPM
-static uint16_t AccPedoCharHandle;
+uint16_t AccPedoCharHandle;
 #endif /* OSX_BMS_MOTIONPM */
 
-static uint16_t ConfigServW2STHandle;
-static uint16_t ConfigCharHandle;
+uint16_t ConfigServW2STHandle;
+uint16_t ConfigCharHandle;
 
-static uint16_t ConsoleW2STHandle;
-static uint16_t TermCharHandle;
-static uint16_t StdErrCharHandle;
+uint16_t ConsoleW2STHandle;
+uint16_t TermCharHandle;
+uint16_t StdErrCharHandle;
 
 static uint8_t LastStderrBuffer[W2ST_CONSOLE_MAX_CHAR_LEN];
 static uint8_t LastStderrLen;
@@ -184,13 +184,9 @@ static uint8_t LastTermLen;
 
 static uint8_t  EnvironmentalCharSize=2; /* Size for Environmental BLE characteristic */
 
-static uint32_t SizeOfUpdateBlueFW=0;
-
-static uint16_t connection_handle = 0;
 
 /* private function */
-static tBleStatus Term_Update_AfterRead(void);
-static tBleStatus Stderr_Update_AfterRead(void);
+
 
 /**
  * @brief  Add the Config service using a vendor specific profile
@@ -359,7 +355,7 @@ tBleStatus Term_Update(uint8_t *data,uint8_t length)
  * @param None
  * @retval tBleStatus      Status
  */
-static tBleStatus Stderr_Update_AfterRead(void)
+tBleStatus Stderr_Update_AfterRead(void)
 {
 	tBleStatus ret;
 
@@ -377,7 +373,7 @@ static tBleStatus Stderr_Update_AfterRead(void)
  * @param None
  * @retval tBleStatus      Status
  */
-static tBleStatus Term_Update_AfterRead(void)
+tBleStatus Term_Update_AfterRead(void)
 {
 	tBleStatus ret;
 
@@ -980,7 +976,7 @@ tBleStatus GG_Update(void)
 {
 	tBleStatus ret;
 	uint32_t voltage, soc;
-	uint8_t v_mode;
+//	uint8_t v_mode;
 
 	uint8_t buff[2+2+2+2+1];
 
