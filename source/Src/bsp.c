@@ -35,8 +35,7 @@
 #include "usbd_cdc_if.h"
 #include "usb_device.h"
 #include "main.h"
-#include "bsp_hum_temp.h"
-#include "bsp_pressure.h"
+
 
 
 const char Dev_Msg[] =

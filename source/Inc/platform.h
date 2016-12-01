@@ -74,6 +74,9 @@
 #define Task_BlueNRGHCI_Stack        500    //task stack
 #define Task_BlueNRGHCI_Priority     2      //task priority
 
+#define TASK_SENSOR_MANAGEMENT_STACK			500 
+#define TASK_SENSOR_MANAGEMENT_PRIORITY			4
+
 
 
 #ifdef PRINTFLOG

@@ -49,6 +49,7 @@ FIL  MyFile;     /* File object */
 /* Private variables ---------------------------------------------------------*/
 xTaskHandle  xHandleLedCtl;
 xTaskHandle  xHandleBlueNRGHCI;
+xTaskHandle  xHandleSensorManagement;
 
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,7 +98,11 @@ int main(void)
                 Task_BlueNRGHCI_Stack,      //stack大小，单位word
                 NULL,                       //任务参数
                 Task_BlueNRGHCI_Priority,   //任务优先级
-                &xHandleBlueNRGHCI);        //任务句柄           
+                &xHandleBlueNRGHCI);        //任务句柄 
+
+	/* Sensor menmagement Task */
+	xTaskCreate(sensor_management_task_handle,"Sensor",TASK_SENSOR_MANAGEMENT_STACK,NULL,
+				TASK_SENSOR_MANAGEMENT_PRIORITY,&xHandleSensorManagement);
                 
     /* Start scheduler */
     vTaskStartScheduler();
@@ -140,6 +145,7 @@ void LedCtlTask(void *pvParameters)
         g_Axes_data.AXIS_Y += 100;
         g_Axes_data.AXIS_Z += 100;
 //        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
+		
         vTaskDelay(g_LedFlashTime);     //控制LDE闪烁频率
     }
 }

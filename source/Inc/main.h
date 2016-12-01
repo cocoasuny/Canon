@@ -56,6 +56,13 @@
 #include "shell.h"
 #include "bsp_rtc_calendar.h"
 #include "Log.h"
+#include "sensor_management.h"
+#include "bsp_hum_temp.h"
+#include "bsp_pressure.h"
+
+
+
+
 
 /* Exported macro ------------------------------------------------------------*/
 #define MCR_BLUEMS_F2I_1D(in, out_int, out_dec) {out_int = (int32_t)in; out_dec= (int32_t)((in-out_int)*10);};

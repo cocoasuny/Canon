@@ -334,7 +334,6 @@ tBleStatus Ble_AdvAddress_Set(void)
 static void Read_Request_CB(uint16_t handle)
 {
     //获取handle
-	
 	if(handle == EnvironmentalCharHandle + 1)
 	{
 		/* Read Request for Pressure,Humidity, and Temperatures*/
