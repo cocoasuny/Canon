@@ -147,7 +147,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
            the HAL_UART_TxCpltCallback could be implemented in the user file
    */
 //    uint8_t i=0;
-	if(huart == &huart1)
+	if(huart == &huart2)
 	{        
         //接收中断
         if(shell_rx_rdy)
@@ -193,7 +193,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             }
         }
         /* Put UART peripheral in reception process ###########################*/  
-        if(HAL_UART_Receive_IT(&huart1, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+        if(HAL_UART_Receive_IT(&huart2, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
         {
             //printf("Uart Init Error\r\n");
         }

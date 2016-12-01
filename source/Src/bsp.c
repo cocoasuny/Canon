@@ -54,8 +54,8 @@ const char Dev_Msg[] =
  */
 /* uart */
 static uint8_t UsbSendData(uint8_t* pBuf, uint16_t nLen);
-UART_HandleTypeDef huart1;
-static UART_HandleTypeDef huart2;
+static UART_HandleTypeDef huart1;
+UART_HandleTypeDef huart2;
 static uint8_t	ledStatus = OFF;
 
 /*I2c*/
@@ -114,8 +114,8 @@ void Bsp_Init(void)
     
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
-    MX_USART1_UART_Init();   //for debug & shell
-	MX_USART2_UART_Init();   //ANO地面站使用
+    MX_USART1_UART_Init();   //ANO地面站使用
+	MX_USART2_UART_Init();   //for debug & shell
     BSP_RTC_Calendar_Init();
     
     /* init code for USB_DEVICE */
@@ -314,7 +314,7 @@ void BSP_Usart_DataSend(uint8_t *dataToSend , uint8_t length)
 	
 	for(i=0;i<length;i++)
 	{
-		HAL_StatusTypeDef status = HAL_UART_Transmit(&huart2, (uint8_t *)&dataToSend[i], 1, 0xFFFF);
+		HAL_StatusTypeDef status = HAL_UART_Transmit(&huart1, (uint8_t *)&dataToSend[i], 1, 0xFFFF);
 	}
 }
 
@@ -327,7 +327,7 @@ int fputc(int ch, FILE *f)
 {
     /* Place your implementation of fputc here */
     /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
-    HAL_StatusTypeDef status = HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
+    HAL_StatusTypeDef status = HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
     if (status != HAL_OK) {
         //while (1);
@@ -360,15 +360,21 @@ void MX_USART1_UART_Init(void)
 /* USART2 init function */
 void MX_USART2_UART_Init(void)
 {
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&huart2);
+	huart2.Instance = USART2;
+	huart2.Init.BaudRate = 115200;
+	huart2.Init.WordLength = UART_WORDLENGTH_8B;
+	huart2.Init.StopBits = UART_STOPBITS_1;
+	huart2.Init.Parity = UART_PARITY_NONE;
+	huart2.Init.Mode = UART_MODE_TX_RX;
+	huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+	HAL_UART_Init(&huart2);
+	
+    /*##-2- Put UART peripheral in reception process ###########################*/  
+    if(HAL_UART_Receive_IT(&huart2, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+    {
+        printf("Uart Init Error\r\n");
+    }  	
 }
 
 
@@ -403,8 +409,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 		/* USER CODE BEGIN USART1_MspInit 1 */
-		HAL_NVIC_SetPriority(USART1_IRQn, 5, 0);
-		HAL_NVIC_EnableIRQ(USART1_IRQn);
+
 		/* USER CODE END USART1_MspInit 1 */
 	}
 	else if(huart->Instance==USART2)
@@ -427,7 +432,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 		/* USER CODE BEGIN USART2_MspInit 1 */
-
+		HAL_NVIC_SetPriority(USART2_IRQn, 5, 0);
+		HAL_NVIC_EnableIRQ(USART2_IRQn);
 		/* USER CODE END USART2_MspInit 1 */
 	}
 }

@@ -147,9 +147,12 @@ tBleStatus Service_Init(void)
     /*gatt_Init*/
     ret = aci_gatt_init();
 
-    if(ret)
+    if(ret != BLE_STATUS_SUCCESS)
     {
-//        return BLE_GATT_INIT_FAILED;
+		#ifdef Debug_BlueNRF
+			printf("GATT_Init failed...0x%x\r\n",ret);
+		#endif			
+        return ret;
     }
 
     ret = aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
@@ -158,16 +161,16 @@ tBleStatus Service_Init(void)
 		#ifdef Debug_BlueNRF
 			printf("GAP_Init failed...0x%x\r\n",ret);
 		#endif		
-//        return BLE_GAP_INIT_FAILED;
+        return ret;
     }
 	
 	ret = hci_le_set_random_address(bdaddr);
-    if(ret != 0)
+    if(ret != BLE_STATUS_SUCCESS)
     {
 		#ifdef Debug_BlueNRF
-			printf("Setting the Static Random BD_ADDR failed\r\n");
+			printf("Setting the Static Random BD_ADDR failed:0x%x\r\n",ret);
 		#endif		
-//        return BLE_GAP_INIT_FAILED;
+        return ret;
     }
 	
     ret = aci_gap_set_auth_requirement(MITM_PROTECTION_REQUIRED,
@@ -181,9 +184,9 @@ tBleStatus Service_Init(void)
     if (ret != BLE_STATUS_SUCCESS)
     {
 		#ifdef Debug_BlueNRF
-			printf("BLE Stack Initialized.\r\n");
+			printf("BLE Stack Initialized.0x%x\r\n",ret);
 		#endif		
-//        return BLE_STACK_INIT_FAILED;
+        return ret;
     }
 
 	/**********  add  SERVICEs ***********/
@@ -191,7 +194,7 @@ tBleStatus Service_Init(void)
 	if(ret != BLE_STATUS_SUCCESS) 
 	{
 		#ifdef Debug_BlueNRF
-			printf("Error while adding HW Service W2ST\r\n");
+			printf("Error while adding HW Service W2ST:0x%x\r\n",ret);
 		#endif
 		return BLE_STATUS_ERROR;
 	}
@@ -200,7 +203,7 @@ tBleStatus Service_Init(void)
 	if(ret != BLE_STATUS_SUCCESS)
 	{
 		#ifdef Debug_BlueNRF
-			printf("Error while adding SW Service W2ST\r\n");
+			printf("Error while adding SW Service W2ST:0x%x\r\n",ret);
 		#endif
 		return BLE_STATUS_ERROR;
 	}
@@ -209,20 +212,21 @@ tBleStatus Service_Init(void)
 	if(ret != BLE_STATUS_SUCCESS)
 	{
 		#ifdef Debug_BlueNRF
-			printf("\r\nError while adding Console Service W2ST\r\n");
+			printf("\r\nError while adding Console Service W2ST:0x%x\r\n",ret);
 		#endif
 		return BLE_STATUS_ERROR;
 	}	
 	
 	ret = Add_ConfigW2ST_Service();
-	if(ret == BLE_STATUS_SUCCESS)
+	if(ret != BLE_STATUS_SUCCESS)
 	{
 		#ifdef Debug_BlueNRF
-			printf("\r\nError while adding Config Service W2ST\r\n");
+			printf("\r\nError while adding Config Service W2ST:0x%x\r\n",ret);
 		#endif
+		return BLE_STATUS_ERROR;
 	}	
 	
-    return ret;
+    return BLE_STATUS_SUCCESS;
 }
 /**
    * @brief 开始广播
