@@ -59,6 +59,7 @@
 #include "sensor_management.h"
 #include "bsp_hum_temp.h"
 #include "bsp_pressure.h"
+#include "bsp_accelero.h"
 
 
 
@@ -77,6 +78,7 @@ extern uint8_t  g_aRxBuffer[RXBUFFERSIZE];
 extern char SDPath[4];  /* SD logical drive path */
 extern FATFS SDFatFs;  /* File system object for SD card logical drive */
 extern FIL  MyFile;     /* File object */
+extern MEMS_HANDLE_t					g_MEMSHandler;
 
 void MX_GPIO_Init(void);
 void MX_SDIO_SD_Init(void);

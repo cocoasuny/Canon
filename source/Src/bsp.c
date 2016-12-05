@@ -61,6 +61,7 @@ static uint8_t	ledStatus = OFF;
 uint32_t I2C_EXPBD_Timeout = NUCLEO_I2C_EXPBD_TIMEOUT_MAX;    /*<! Value of Timeout when I2C communication fails */
 static I2C_HandleTypeDef    I2C_EXPBD_Handle;
 
+
 /* Link function for PRESSURE peripheral */
 PRESSURE_StatusTypeDef LPS25H_IO_Init(void);
 void LPS25H_IO_ITConfig( void );
@@ -108,6 +109,7 @@ static HAL_StatusTypeDef I2C_EXPBD_ReadData(uint8_t* pBuffer, uint8_t Addr, uint
 void Bsp_Init(void)
 {
     uint8_t BSP_init_Status = true;
+	DrvStatusTypeDef	drvStatus = COMPONENT_ERROR;
     RTC_DateTypeDef date_s;
     RTC_TimeTypeDef rtc_time;    
     
@@ -141,6 +143,14 @@ void Bsp_Init(void)
         BSP_init_Status = false;
     }
     
+	/* init code for acceler */
+	drvStatus = BSP_ACCELERO_Init(LSM6DS3_X_0,&g_MEMSHandler.HandleAccSensor);
+	if(drvStatus != COMPONENT_OK)
+	{
+        printf("BSP ACC Init Err:%d\r\n",drvStatus);
+        BSP_init_Status = false;		
+	}
+	
     #ifndef PRINTFLOG
         HAL_Delay(5000);
     #endif
@@ -743,6 +753,96 @@ static PRESSURE_StatusTypeDef PRESSURE_IO_Read(uint8_t* pBuffer, uint8_t DeviceA
     }
 
     return ret_val;
+}
+
+/********************************* LINK IMU 6 AXES *****************************/
+/**
+ * @brief  Configures LSM6DS3 I2C interface
+ * @retval COMPONENT_OK in case of success, an error code otherwise
+ */
+DrvStatusTypeDef LSM6DS3_IO_Init( void )
+{
+    if(I2C_EXPBD_Init() != HAL_OK)
+    {
+        return COMPONENT_ERROR;
+    }
+    return COMPONENT_OK;
+}
+
+/**
+ * @brief  Configures LSM6DS3 interrupt lines for NUCLEO boards
+ * @retval None
+ */
+void LSM6DS3_IO_ITConfig( void )
+{
+    GPIO_InitTypeDef GPIO_InitStructureInt1;
+
+	
+    /* Enable INT1 GPIO clock */
+    MEMS_INT1_GPIO_CLK_ENABLE();
+
+    /* Configure GPIO PINs to detect Interrupts */
+    GPIO_InitStructureInt1.Pin = MEMS_INT1_PIN;
+    GPIO_InitStructureInt1.Mode = GPIO_MODE_IT_RISING;
+    GPIO_InitStructureInt1.Speed = GPIO_SPEED_FAST;
+
+
+    GPIO_InitStructureInt1.Pull  = GPIO_NOPULL;
+    HAL_GPIO_Init(MEMS_INT1_GPIO_PORT, &GPIO_InitStructureInt1);
+
+    /* Enable and set EXTI Interrupt priority */
+    HAL_NVIC_SetPriority(MEMS_INT1_EXTI_IRQn, 0x00, 0x00);
+    HAL_NVIC_EnableIRQ(MEMS_INT1_EXTI_IRQn);
+}
+
+/**
+ * @brief  Writes a buffer to the sensor
+ * @param  handle instance handle
+ * @param  WriteAddr specifies the internal sensor address register to be written to
+ * @param  pBuffer pointer to data buffer
+ * @param  nBytesToWrite number of bytes to be written
+ * @retval 0 in case of success
+ * @retval 1 in case of failure
+ */
+uint8_t LSM6DS3_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToWrite )
+{
+	DrvContextTypeDef *ctx = (DrvContextTypeDef *)handle;
+
+	/* call I2C_EXPBD Read data bus function */
+	if (I2C_EXPBD_WriteData( pBuffer,ctx->address, WriteAddr, nBytesToWrite) != HAL_OK)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}		
+}
+
+/**
+ * @brief  Reads a from the sensor to buffer
+ * @param  handle instance handle
+ * @param  ReadAddr specifies the internal sensor address register to be read from
+ * @param  pBuffer pointer to data buffer
+ * @param  nBytesToRead number of bytes to be read
+ * @retval 0 in case of success
+ * @retval 1 in case of failure
+ */
+uint8_t LSM6DS3_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToRead )
+{
+	DrvContextTypeDef *ctx = (DrvContextTypeDef *)handle;
+
+	/* call I2C_EXPBD Read data bus function */
+	if ( I2C_EXPBD_ReadData(pBuffer, ctx->address, ReadAddr,  nBytesToRead ) != HAL_OK)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}	
 }
 
 /******************************* I2C Routines**********************************/

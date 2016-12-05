@@ -35,9 +35,10 @@
 
 
 /* Global variables ----------------------------------------------------------*/
-volatile AxesRaw_t g_Axes_data = {0, 0, 0};
-uint16_t g_LedFlashTime = 500;
-uint8_t  g_aRxBuffer[RXBUFFERSIZE] = {0};
+volatile AxesRaw_t 				g_Axes_data = {0, 0, 0};
+uint16_t 						g_LedFlashTime = 500;
+uint8_t  						g_aRxBuffer[RXBUFFERSIZE] = {0};
+MEMS_HANDLE_t					g_MEMSHandler;
 
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;

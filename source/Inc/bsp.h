@@ -40,6 +40,7 @@
 #include <stdarg.h>			/* 因为用到了va_start等va_宏，所以必须包含这个文件 */
 #include <stdio.h>			/* 因为用到了printf函数，所以必须包含这个文件 */
 #include "hum_temp.h"
+#include "global_typedef.h"
 
 /* Store Value into a buffer in Little Endian Format */
 #define STORE_LE_16(buf, val)    ( ((buf)[0] =  (uint8_t) (val)    ) , \
@@ -106,6 +107,13 @@ void USBLog(const char* lpszFormat, ...);
 void BSP_Usart_DataSend(uint8_t *dataToSend , uint8_t length);
 void app_error_handler(uint32_t error_code, uint32_t line_num, const uint8_t * p_file_name);
 void Sys_SoftReset(void);
+/* Link function for 6 Axes IMU peripheral */
+DrvStatusTypeDef LSM6DS3_IO_Init( void );
+void LSM6DS3_IO_ITConfig( void );
+uint8_t LSM6DS3_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToWrite );
+uint8_t LSM6DS3_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToRead );
 
 #endif /* __bsp_H */
 

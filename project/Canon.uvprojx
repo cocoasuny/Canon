@@ -347,7 +347,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -538,6 +538,11 @@
               <FileType>1</FileType>
               <FilePath>..\source\Src\bsp_rtc_calendar.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_accelero.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Src\bsp_accelero.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -582,6 +587,16 @@
               <FileName>lps25hb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\source\Drivers\Components\lps25hb.c</FilePath>
+            </File>
+            <File>
+              <FileName>LSM6DS3_ACC_GYRO_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Drivers\Components\LSM6DS3_ACC_GYRO_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>LSM6DS3_ACC_GYRO_driver_HL.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Drivers\Components\LSM6DS3_ACC_GYRO_driver_HL.c</FilePath>
             </File>
           </Files>
         </Group>

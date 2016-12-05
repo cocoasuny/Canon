@@ -194,8 +194,15 @@
 #define BNRG_SPI_EXTI_PORT          BNRG_SPI_IRQ_PORT
 #define RTC_WAKEUP_IRQHandler       RTC_WKUP_IRQHandler
 
-//EXTI External Interrupt for user button
-#define PUSH_BUTTON_EXTI_IRQHandler EXTI15_10_IRQHandler
+/* GPIO define for mems */
+//LSM6DS3
+#define MEMS_INT1_GPIO_PORT           GPIOC
+#define MEMS_INT1_GPIO_CLK_ENABLE()   __GPIOC_CLK_ENABLE()
+#define MEMS_INT1_GPIO_CLK_DISABLE()  __GPIOC_CLK_DISABLE()
+#define MEMS_INT1_PIN                 GPIO_PIN_0
+
+#define MEMS_INT1_EXTI_IRQn           EXTI0_IRQn
+
 
 #endif /* __PLATFORM_H_ */
 

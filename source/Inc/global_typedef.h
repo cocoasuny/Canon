@@ -94,5 +94,56 @@ typedef enum
 } SensorFs_t;
 
 
+/**
+ * @brief  Component's Status enumerator definition.
+ */
+typedef enum
+{
+  COMPONENT_OK = 0,
+  COMPONENT_ERROR,
+  COMPONENT_TIMEOUT,
+  COMPONENT_NOT_IMPLEMENTED
+} DrvStatusTypeDef;
+
+/**
+ * @brief  Component's Context structure definition.
+ */
+typedef struct
+{
+
+  /* Identity */
+  uint8_t who_am_i;
+  
+  
+  /* Configuration */
+  uint8_t ifType;        /* 0 means I2C, 1 means SPI, etc. */
+  uint8_t address;       /* Sensor I2C address (NOTE: Not a unique sensor ID). */
+  uint8_t spiDevice;     /* Sensor Chip Select for SPI Bus */
+  uint8_t instance;      /* Sensor instance (NOTE: Sensor ID unique only within its class). */
+  uint8_t isInitialized; /* Sensor setup done. */
+  uint8_t isEnabled;     /* Sensor ON. */
+  uint8_t isCombo;       /* Combo sensor (component consists of more sensors). */
+  
+  /* Pointer to the Data */
+  void *pData;
+  
+  /* Pointer to the Virtual Table */
+  void *pVTable;
+  /* Pointer to the Extended Virtual Table */
+  void *pExtVTable;
+} DrvContextTypeDef;
+
+/**
+ * @brief  Target's Features data structure definition
+ */
+typedef struct
+{
+  void *HandleAccSensor;
+  void *HandleGyroSensor;
+  void *HandleMagSensor;
+}MEMS_HANDLE_t;
+
+
+
 #endif /* __GLOBALTYPEDEF_H */
 
