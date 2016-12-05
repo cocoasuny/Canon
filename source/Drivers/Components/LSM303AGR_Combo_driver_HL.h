@@ -1,11 +1,10 @@
 /**
  ******************************************************************************
- * @file    magnetometer.h
+ * @file    LSM303AGR_Combo_driver_HL.h
  * @author  MEMS Application Team
  * @version V2.0.0
- * @date    10-December-2015
- * @brief   This header file contains the functions prototypes for the
- *          magnetometer driver
+ * @date    27-January-2016
+ * @brief   This file contains definitions for the LSM303AGR combo driver
  ******************************************************************************
  * @attention
  *
@@ -37,17 +36,13 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAGNETOMETER_H
-#define __MAGNETOMETER_H
+#ifndef __LSM303AGR_COMBO_DRIVER_HL_H
+#define __LSM303AGR_COMBO_DRIVER_HL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-
-/* Includes ------------------------------------------------------------------*/
-#include "global_typedef.h"
 
 /** @addtogroup BSP BSP
  * @{
@@ -57,52 +52,41 @@ extern "C" {
  * @{
  */
 
-/** @addtogroup COMMON COMMON
+/** @addtogroup LSM303AGR_COMBO LSM303AGR_COMBO
  * @{
  */
 
-/** @addtogroup MAGNETOMETER MAGNETOMETER
+/** @addtogroup LSM303AGR_COMBO_Public_Constants Public constants
  * @{
  */
-
-/** @addtogroup MAGNETOMETER_Public_Types MAGNETOMETER Public types
- * @{
- */
-
-/**
- * @brief  MAGNETOMETER driver structure definition
- */
-typedef struct
-{
-  DrvStatusTypeDef ( *Init            ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *DeInit          ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Sensor_Enable   ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Sensor_Disable  ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Get_WhoAmI      ) ( DrvContextTypeDef*, uint8_t* );
-  DrvStatusTypeDef ( *Check_WhoAmI    ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Get_Axes        ) ( DrvContextTypeDef*, SensorAxes_t* );
-  DrvStatusTypeDef ( *Get_AxesRaw     ) ( DrvContextTypeDef*, SensorAxesRaw_t* );
-  DrvStatusTypeDef ( *Get_Sensitivity ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Get_ODR         ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Set_ODR         ) ( DrvContextTypeDef*, SensorOdr_t );
-  DrvStatusTypeDef ( *Set_ODR_Value   ) ( DrvContextTypeDef*, float );
-  DrvStatusTypeDef ( *Get_FS          ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Set_FS          ) ( DrvContextTypeDef*, SensorFs_t );
-  DrvStatusTypeDef ( *Set_FS_Value    ) ( DrvContextTypeDef*, float );
-} MAGNETO_Drv_t;
-
-/**
- * @brief  MAGNETOMETER data structure definition
- */
-typedef struct
-{
-  void *pComponentData; /* Component specific data. */
-  void *pExtData;       /* Other data. */
-} MAGNETO_Data_t;
+#define LSM303AGR_SENSORS_MAX_NUM  1     /**< LSM303AGR max number of instances */
 
 /**
  * @}
  */
+
+/** @addtogroup LSM303AGR_COMBO_Public_Types LSM303AGR_COMBO Public Types
+ * @{
+ */
+
+/**
+ * @brief LSM303AGR combo specific data internal structure definition
+ */
+typedef struct
+{
+  uint8_t isAccInitialized;
+  uint8_t isMagInitialized;
+} LSM303AGR_Combo_Data_t;
+
+/**
+ * @}
+ */
+
+/** @addtogroup LSM303AGR_COMBO_Public_Variables Public variables
+ * @{
+ */
+
+extern LSM303AGR_Combo_Data_t LSM303AGR_Combo_Data[LSM303AGR_SENSORS_MAX_NUM];
 
 /**
  * @}
@@ -124,6 +108,6 @@ typedef struct
 }
 #endif
 
-#endif /* __MAGNETOMETER_H */
+#endif /* __LSM303AGR_COMBO_DRIVER_HL_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

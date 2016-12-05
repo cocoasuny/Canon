@@ -115,5 +115,12 @@ uint8_t LSM6DS3_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer,
 uint8_t LSM6DS3_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
 									uint16_t nBytesToRead );
 
+/* Link function for Magneto */
+DrvStatusTypeDef LSM303AGR_IO_Init( void );
+uint8_t LSM303AGR_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToWrite );
+uint8_t LSM303AGR_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToRead );
+
 #endif /* __bsp_H */
 

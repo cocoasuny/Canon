@@ -157,6 +157,14 @@ void Bsp_Init(void)
 	{
         printf("BSP GYRO Init Err:%d\r\n",drvStatus);
         BSP_init_Status = false;		
+	}
+
+	/* init code for magneto */
+	drvStatus = BSP_MAGNETO_Init(LSM303AGR,&g_MEMSHandler.HandleMagSensor);
+	if(drvStatus != COMPONENT_OK)
+	{
+        printf("BSP Magneto Init Err:%d\r\n",drvStatus);
+        BSP_init_Status = false;		
 	}	
 	
     #ifndef PRINTFLOG
@@ -838,6 +846,70 @@ uint8_t LSM6DS3_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer,
  * @retval 1 in case of failure
  */
 uint8_t LSM6DS3_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToRead )
+{
+	DrvContextTypeDef *ctx = (DrvContextTypeDef *)handle;
+
+	/* call I2C_EXPBD Read data bus function */
+	if ( I2C_EXPBD_ReadData(pBuffer, ctx->address, ReadAddr,  nBytesToRead ) != HAL_OK)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}	
+}
+
+
+/********************************* LINK Magneto *****************************/
+/**
+ * @brief  Configures LSM303AGR I2C interface
+ * @retval COMPONENT_OK in case of success, an error code otherwise
+ */
+DrvStatusTypeDef LSM303AGR_IO_Init( void )
+{
+    if(I2C_EXPBD_Init() != HAL_OK)
+    {
+        return COMPONENT_ERROR;
+    }
+    return COMPONENT_OK;
+}
+/**
+ * @brief  Writes a buffer to the sensor
+ * @param  handle instance handle
+ * @param  WriteAddr specifies the internal sensor address register to be written to
+ * @param  pBuffer pointer to data buffer
+ * @param  nBytesToWrite number of bytes to be written
+ * @retval 0 in case of success
+ * @retval 1 in case of failure
+ */
+uint8_t LSM303AGR_IO_Write( void *handle, uint8_t WriteAddr, uint8_t *pBuffer, 
+									uint16_t nBytesToWrite )
+{
+	DrvContextTypeDef *ctx = (DrvContextTypeDef *)handle;
+
+	/* call I2C_EXPBD Read data bus function */
+	if (I2C_EXPBD_WriteData( pBuffer,ctx->address, WriteAddr, nBytesToWrite) != HAL_OK)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}		
+}
+
+/**
+ * @brief  Reads a from the sensor to buffer
+ * @param  handle instance handle
+ * @param  ReadAddr specifies the internal sensor address register to be read from
+ * @param  pBuffer pointer to data buffer
+ * @param  nBytesToRead number of bytes to be read
+ * @retval 0 in case of success
+ * @retval 1 in case of failure
+ */
+uint8_t LSM303AGR_IO_Read( void *handle, uint8_t ReadAddr, uint8_t *pBuffer, 
 									uint16_t nBytesToRead )
 {
 	DrvContextTypeDef *ctx = (DrvContextTypeDef *)handle;

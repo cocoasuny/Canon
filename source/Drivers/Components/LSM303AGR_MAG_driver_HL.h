@@ -1,15 +1,14 @@
 /**
  ******************************************************************************
- * @file    magnetometer.h
+ * @file    LSM303AGR_MAG_driver_HL.h
  * @author  MEMS Application Team
  * @version V2.0.0
  * @date    10-December-2015
- * @brief   This header file contains the functions prototypes for the
- *          magnetometer driver
+ * @brief   This file contains definitions for the LSM303AGR_MAG_driver_HL.c firmware driver
  ******************************************************************************
  * @attention
  *
- * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+ * <h2><center>&copy; COPYRIGHT(c) 2015 STMicroelectronics</center></h2>
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
@@ -37,8 +36,8 @@
  */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAGNETOMETER_H
-#define __MAGNETOMETER_H
+#ifndef __LSM303AGR_MAG_DRIVER_HL_H
+#define __LSM303AGR_MAG_DRIVER_HL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,7 +46,13 @@ extern "C" {
 
 
 /* Includes ------------------------------------------------------------------*/
-#include "global_typedef.h"
+#include "magnetometer.h"
+
+/* Include magnetic sensor component drivers. */
+#include "LSM303AGR_MAG_driver.h"
+#include "LSM303AGR_Combo_driver_HL.h"
+
+
 
 /** @addtogroup BSP BSP
  * @{
@@ -57,52 +62,53 @@ extern "C" {
  * @{
  */
 
-/** @addtogroup COMMON COMMON
+/** @addtogroup LSM303AGR LSM303AGR
  * @{
  */
 
-/** @addtogroup MAGNETOMETER MAGNETOMETER
+/** @addtogroup LSM303AGR_Public_Constants Public constants
  * @{
  */
 
-/** @addtogroup MAGNETOMETER_Public_Types MAGNETOMETER Public types
+/** @addtogroup LSM303AGR_SENSITIVITY Sensitivity values based on selected full scale
  * @{
  */
 
-/**
- * @brief  MAGNETOMETER driver structure definition
- */
-typedef struct
-{
-  DrvStatusTypeDef ( *Init            ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *DeInit          ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Sensor_Enable   ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Sensor_Disable  ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Get_WhoAmI      ) ( DrvContextTypeDef*, uint8_t* );
-  DrvStatusTypeDef ( *Check_WhoAmI    ) ( DrvContextTypeDef* );
-  DrvStatusTypeDef ( *Get_Axes        ) ( DrvContextTypeDef*, SensorAxes_t* );
-  DrvStatusTypeDef ( *Get_AxesRaw     ) ( DrvContextTypeDef*, SensorAxesRaw_t* );
-  DrvStatusTypeDef ( *Get_Sensitivity ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Get_ODR         ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Set_ODR         ) ( DrvContextTypeDef*, SensorOdr_t );
-  DrvStatusTypeDef ( *Set_ODR_Value   ) ( DrvContextTypeDef*, float );
-  DrvStatusTypeDef ( *Get_FS          ) ( DrvContextTypeDef*, float* );
-  DrvStatusTypeDef ( *Set_FS          ) ( DrvContextTypeDef*, SensorFs_t );
-  DrvStatusTypeDef ( *Set_FS_Value    ) ( DrvContextTypeDef*, float );
-} MAGNETO_Drv_t;
-
-/**
- * @brief  MAGNETOMETER data structure definition
- */
-typedef struct
-{
-  void *pComponentData; /* Component specific data. */
-  void *pExtData;       /* Other data. */
-} MAGNETO_Data_t;
+#define LSM303AGR_MAG_SENSITIVITY_FOR_FS_4G   0.14  /**< Sensitivity value for 4 gauss full scale [LSB/gauss] */
+#define LSM303AGR_MAG_SENSITIVITY_FOR_FS_8G   0.29  /**< Sensitivity value for 8 gauss full scale [LSB/gauss] */
+#define LSM303AGR_MAG_SENSITIVITY_FOR_FS_12G  0.43  /**< Sensitivity value for 12 gauss full scale [LSB/gauss] */
+#define LSM303AGR_MAG_SENSITIVITY_FOR_FS_16G  0.58  /**< Sensitivity value for 16 gauss full scale [LSB/gauss] */
 
 /**
  * @}
  */
+
+/**
+ * @}
+ */
+
+/** @addtogroup LSM303AGR_Public_Types LSM303AGR Public Types
+ * @{
+ */
+
+/**
+ * @brief LSM303AGR magneto specific data internal structure definition
+ */
+
+typedef struct
+{
+  LSM303AGR_Combo_Data_t *comboData;       /* Combo data to manage in software SPI 3-Wire initialization of the combo sensors */
+} LSM303AGR_M_Data_t;
+
+/**
+ * @}
+ */
+
+/** @addtogroup LSM303AGR_Public_Variables Public variables
+ * @{
+ */
+
+extern MAGNETO_Drv_t LSM303AGR_M_Drv;
 
 /**
  * @}
@@ -124,6 +130,6 @@ typedef struct
 }
 #endif
 
-#endif /* __MAGNETOMETER_H */
+#endif /* __LSM303AGR_MAG_DRIVER_HL_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

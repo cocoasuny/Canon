@@ -61,6 +61,7 @@
 #include "bsp_pressure.h"
 #include "bsp_accelero.h"
 #include "bsp_gyro.h"
+#include "bsp_magneto.h"
 
 
 
