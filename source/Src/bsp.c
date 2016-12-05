@@ -151,6 +151,14 @@ void Bsp_Init(void)
         BSP_init_Status = false;		
 	}
 	
+	/* init code for gyroscope */
+	drvStatus = BSP_GYRO_Init(LSM6DS3_G_0,&g_MEMSHandler.HandleGyroSensor);
+	if(drvStatus != COMPONENT_OK)
+	{
+        printf("BSP GYRO Init Err:%d\r\n",drvStatus);
+        BSP_init_Status = false;		
+	}	
+	
     #ifndef PRINTFLOG
         HAL_Delay(5000);
     #endif

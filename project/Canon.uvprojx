@@ -543,6 +543,11 @@
               <FileType>1</FileType>
               <FilePath>..\source\Src\bsp_accelero.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_gyro.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Src\bsp_gyro.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
