@@ -39,6 +39,9 @@ volatile AxesRaw_t 				gAxesData = {0, 0, 0};
 uint16_t 						gLedFlashTime = 500;
 uint8_t  						gRxBuffer[RXBUFFERSIZE] = {0};
 MEMS_HANDLE_t					gMEMSHandler;
+osxMFX_calibFactor 				magOffset; 
+float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
+
 
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;

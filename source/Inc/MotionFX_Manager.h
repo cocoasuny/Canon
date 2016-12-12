@@ -1,14 +1,20 @@
 /**
   ******************************************************************************
-  * @file    main.h
-  * @author  CL
-  * @version V1.0.0
-  * @date    04-July-2014
-  * @brief   
+  * @file    MotionFX_Manager.h
+  * @author  Central LAB
+  * @version V3.1.1
+  * @date    21-October-2016
+  * @brief   This file includes sensor fusion interface functions
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  *
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -33,62 +39,26 @@
   * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */ 
+  */
   
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H_
-#define __MAIN_H_
+#ifndef _MOTIONFX_MANAGER_H_
+#define _MOTIONFX_MANAGER_H_
 
-/* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx_hal.h"
-#include "fatfs.h"
-#include "cmsis_os.h"
-#include "usb_device.h"
-#include "bsp.h"
-#include "platform.h"
-#include "bluenrg_interface.h"
-#include "hci.h"
-#include "bluenrg_utils.h"
-#include "bluenrg_service.h"
-#include "freertostask.h"
-#include "bluenrg_sensor_service.h"
-#include "global_typedef.h"
-#include "shell.h"
-#include "bsp_rtc_calendar.h"
-#include "Log.h"
-#include "sensor_management.h"
-#include "bsp_hum_temp.h"
-#include "bsp_pressure.h"
-#include "bsp_accelero.h"
-#include "bsp_gyro.h"
-#include "bsp_magneto.h"
+#include "main.h"
 #include "osx_motion_fx.h"
-#include "MotionFX_Manager.h"
 
+/* Exported functions ------------------------------------------------------- */
+extern void MotionFX_manager_init(void);
+extern void MotionFX_manager_start_6X(void);
+extern void MotionFX_manager_stop_6X(void);
+extern void MotionFX_manager_start_9X(void);
+extern void MotionFX_manager_stop_9X(void);
+extern void MotionFX_manager_run(SensorAxesRaw_t ACC_Value_Raw,SensorAxes_t GYR_Value,SensorAxes_t MAG_Value);
 
+extern osxMFX_output* MotionFX_manager_getDataOUT(void);
+extern osxMFX_input* MotionFX_manager_getDataIN(void);
 
+#endif //_MOTIONFX_MANAGER_H_
 
-/* Exported macro ------------------------------------------------------------*/
-#define MCR_BLUEMS_F2I_1D(in, out_int, out_dec) {out_int = (int32_t)in; out_dec= (int32_t)((in-out_int)*10);};
-#define MCR_BLUEMS_F2I_2D(in, out_int, out_dec) {out_int = (int32_t)in; out_dec= (int32_t)((in-out_int)*100);};
-
-#define ON		(1)
-#define OFF		(0)
-
-extern volatile AxesRaw_t gAxesData;
-extern uint16_t gLedFlashTime;
-extern uint8_t  gRxBuffer[RXBUFFERSIZE];
-extern char SDPath[4];  /* SD logical drive path */
-extern FATFS SDFatFs;  /* File system object for SD card logical drive */
-extern FIL  MyFile;     /* File object */
-extern MEMS_HANDLE_t					gMEMSHandler;
-extern osxMFX_calibFactor 				magOffset; 
-extern float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
-
-void MX_GPIO_Init(void);
-void MX_SDIO_SD_Init(void);
-
-
-
-#endif /* __MAIN_H_ */
+/******************* (C) COPYRIGHT 2016 STMicroelectronics *****END OF FILE****/
 

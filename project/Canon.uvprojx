@@ -365,7 +365,7 @@
               <MiscControls>--C99 --gnu</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F401xE,BLUENRG_MS,ENABLE_SPI_FIX</Define>
               <Undefine></Undefine>
-              <IncludePath>../source/Inc;../source/Drivers/STM32F4xx_HAL_Driver/Inc;../source/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../source/Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../source/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../source/Drivers/CMSIS/Include;../source/Drivers/CMSIS/Device/ST/STM32F4xx/Include;../source/Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../source/Middlewares/Third_Party/FreeRTOS/Source/include;../source/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../source/Middlewares/Third_Party/FatFs/src/drivers;../source/Middlewares/Third_Party/FatFs/src;../source/Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes;../source/Drivers/Components;../source/Src/shell</IncludePath>
+              <IncludePath>../source/Inc;../source/Drivers/STM32F4xx_HAL_Driver/Inc;../source/Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;../source/Middlewares/ST/STM32_USB_Device_Library/Core/Inc;../source/Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc;../source/Drivers/CMSIS/Include;../source/Drivers/CMSIS/Device/ST/STM32F4xx/Include;../source/Middlewares/Third_Party/FreeRTOS/Source/portable/RVDS/ARM_CM4F;../source/Middlewares/Third_Party/FreeRTOS/Source/include;../source/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS;../source/Middlewares/Third_Party/FatFs/src/drivers;../source/Middlewares/Third_Party/FatFs/src;../source/Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes;../source/Drivers/Components;../source/Src/shell;..\source\Middlewares\ST\STM32_OSX_MotionFX_Library\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -502,6 +502,11 @@
               <FileName>sensor_management.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\source\Src\sensor_management.c</FilePath>
+            </File>
+            <File>
+              <FileName>MotionFX_Manager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Src\MotionFX_Manager.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1127,6 +1132,16 @@
               <FileName>bluenrg_utils_small.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\source\Middlewares\ST\STM32_BlueNRG\SimpleBlueNRG_HCI\hci\controller\bluenrg_utils_small.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Middlewares/ST/OPEN.MEMS</GroupName>
+          <Files>
+            <File>
+              <FileName>osxMotionFX107_CM4_Keil_ot.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\source\Middlewares\ST\STM32_OSX_MotionFX_Library\Lib\osxMotionFX107_CM4_Keil_ot.lib</FilePath>
             </File>
           </Files>
         </Group>

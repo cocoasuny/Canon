@@ -27,6 +27,10 @@ void sensor_management_task_handle(void *pvParameters)
 	BSP_ACCELERO_Sensor_Enable(gMEMSHandler.HandleAccSensor);
 	BSP_GYRO_Sensor_Enable(gMEMSHandler.HandleGyroSensor);
 	BSP_MAGNETO_Sensor_Enable(gMEMSHandler.HandleMagSensor);
+
+	/* osxMotinFX init */
+	MotionFX_manager_init();
+	MotionFX_manager_start_9X();
 	
     while(1)
     {
