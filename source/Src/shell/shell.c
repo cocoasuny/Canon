@@ -158,7 +158,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         {
             if( shell_rx_index < SHELL_RX_MAX)
             {
-                shell_rx_buff[shell_rx_index] = g_aRxBuffer[0];
+                shell_rx_buff[shell_rx_index] = gRxBuffer[0];
                 shell_rx_index++;
             }
             else
@@ -193,7 +193,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             }
         }
         /* Put UART peripheral in reception process ###########################*/  
-        if(HAL_UART_Receive_IT(&huart2, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+        if(HAL_UART_Receive_IT(&huart2, (uint8_t *)gRxBuffer, RXBUFFERSIZE) != HAL_OK)
         {
             //printf("Uart Init Error\r\n");
         }

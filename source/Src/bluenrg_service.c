@@ -472,9 +472,9 @@ void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_da
 	/* If GATT client has modified 'LED Control characteristic' value, toggle LED2 */
 //	if(handle == ledControlCharHandle + 1)
 //	{   
-//		g_LedFlashTime = att_data[0]*256 + att_data[1];
+//		gLedFlashTime = att_data[0]*256 + att_data[1];
 //		#ifdef Debug_LedControl
-//			printf("remote control:%d,%d\r\n",data_length,g_LedFlashTime);
+//			printf("remote control:%d,%d\r\n",data_length,gLedFlashTime);
 //			for(i=0;i<data_length;i++)
 //			{
 //				printf("0x%x,",att_data[i]);

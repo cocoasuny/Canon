@@ -74,13 +74,13 @@
 #define ON		(1)
 #define OFF		(0)
 
-extern volatile AxesRaw_t g_Axes_data;
-extern uint16_t g_LedFlashTime;
-extern uint8_t  g_aRxBuffer[RXBUFFERSIZE];
+extern volatile AxesRaw_t gAxesData;
+extern uint16_t gLedFlashTime;
+extern uint8_t  gRxBuffer[RXBUFFERSIZE];
 extern char SDPath[4];  /* SD logical drive path */
 extern FATFS SDFatFs;  /* File system object for SD card logical drive */
 extern FIL  MyFile;     /* File object */
-extern MEMS_HANDLE_t					g_MEMSHandler;
+extern MEMS_HANDLE_t					gMEMSHandler;
 
 void MX_GPIO_Init(void);
 void MX_SDIO_SD_Init(void);

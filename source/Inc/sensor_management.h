@@ -26,7 +26,8 @@
 
 /* extern functios declare ---------------------------------------------------*/
 void sensor_management_task_handle(void *pvParameters);
-extern void ble_send_environmental_data(void);
+void ble_send_environmental_data(void);
+void ble_send_motion_data(void);
 
 
 #endif /* __SENSOR_MANAGEMENT_H */

@@ -23,9 +23,15 @@
   */
 void sensor_management_task_handle(void *pvParameters)
 {   
+	/* Enable Mems sensors */
+	BSP_ACCELERO_Sensor_Enable(gMEMSHandler.HandleAccSensor);
+	BSP_GYRO_Sensor_Enable(gMEMSHandler.HandleGyroSensor);
+	BSP_MAGNETO_Sensor_Enable(gMEMSHandler.HandleMagSensor);
+	
     while(1)
     {
 		ble_send_environmental_data();
+		ble_send_motion_data();
         vTaskDelay(1000);
     }
 }
@@ -59,7 +65,32 @@ void ble_send_environmental_data(void)
 	Environmental_Update(PressToSend,HumToSend,Temp2ToSend,Temp1ToSend);
 }
 
+/**
+  * @brief  Send Motion Data Acc/Mag/Gyro to BLE
+  * @param  None
+  * @retval None
+  */
+void ble_send_motion_data(void)
+{
+	SensorAxes_t ACC_Value;
+	SensorAxes_t GYR_Value;
+	SensorAxes_t MAG_Value;
 
+	/* Read the Acc values */
+	BSP_ACCELERO_Get_Axes(gMEMSHandler.HandleAccSensor,&ACC_Value);
+
+	/* Read the Magneto values */
+	BSP_MAGNETO_Get_Axes(gMEMSHandler.HandleMagSensor,&MAG_Value);
+
+	/* Read the Gyro values */
+	BSP_GYRO_Get_Axes(gMEMSHandler.HandleGyroSensor,&GYR_Value);
+	
+//	printf("\r\nAcc Data:%d,%d,%d\r\n",ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);
+//	printf("Gyro Data:%d,%d,%d\r\n",GYR_Value.AXIS_X,GYR_Value.AXIS_Y,GYR_Value.AXIS_Z);
+//	printf("Mag Data:%d,%d,%d\r\n",MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);
+
+	AccGyroMag_Update(&ACC_Value,&GYR_Value,&MAG_Value);
+}
 
 
 

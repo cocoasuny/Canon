@@ -35,10 +35,10 @@
 
 
 /* Global variables ----------------------------------------------------------*/
-volatile AxesRaw_t 				g_Axes_data = {0, 0, 0};
-uint16_t 						g_LedFlashTime = 500;
-uint8_t  						g_aRxBuffer[RXBUFFERSIZE] = {0};
-MEMS_HANDLE_t					g_MEMSHandler;
+volatile AxesRaw_t 				gAxesData = {0, 0, 0};
+uint16_t 						gLedFlashTime = 500;
+uint8_t  						gRxBuffer[RXBUFFERSIZE] = {0};
+MEMS_HANDLE_t					gMEMSHandler;
 
 /* Private variables ---------------------------------------------------------*/
 SD_HandleTypeDef hsd;
@@ -142,12 +142,12 @@ void LedCtlTask(void *pvParameters)
         BSP_LED_Toggle();
         
         /* for test */
-        g_Axes_data.AXIS_X += 100;
-        g_Axes_data.AXIS_Y += 100;
-        g_Axes_data.AXIS_Z += 100;
-//        BlueNRG_Update_Acc((AxesRaw_t*)&g_Axes_data);
+        gAxesData.AXIS_X += 100;
+        gAxesData.AXIS_Y += 100;
+        gAxesData.AXIS_Z += 100;
+//        BlueNRG_Update_Acc((AxesRaw_t*)&gAxesData);
 		
-        vTaskDelay(g_LedFlashTime);     //控制LDE闪烁频率
+        vTaskDelay(gLedFlashTime);     //控制LDE闪烁频率
     }
 }
 

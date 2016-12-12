@@ -144,7 +144,7 @@ void Bsp_Init(void)
     }
     
 	/* init code for acceler */
-	drvStatus = BSP_ACCELERO_Init(LSM6DS3_X_0,&g_MEMSHandler.HandleAccSensor);
+	drvStatus = BSP_ACCELERO_Init(LSM6DS3_X_0,&gMEMSHandler.HandleAccSensor);
 	if(drvStatus != COMPONENT_OK)
 	{
         printf("BSP ACC Init Err:%d\r\n",drvStatus);
@@ -152,7 +152,7 @@ void Bsp_Init(void)
 	}
 	
 	/* init code for gyroscope */
-	drvStatus = BSP_GYRO_Init(LSM6DS3_G_0,&g_MEMSHandler.HandleGyroSensor);
+	drvStatus = BSP_GYRO_Init(LSM6DS3_G_0,&gMEMSHandler.HandleGyroSensor);
 	if(drvStatus != COMPONENT_OK)
 	{
         printf("BSP GYRO Init Err:%d\r\n",drvStatus);
@@ -160,7 +160,7 @@ void Bsp_Init(void)
 	}
 
 	/* init code for magneto */
-	drvStatus = BSP_MAGNETO_Init(LSM303AGR,&g_MEMSHandler.HandleMagSensor);
+	drvStatus = BSP_MAGNETO_Init(LSM303AGR,&gMEMSHandler.HandleMagSensor);
 	if(drvStatus != COMPONENT_OK)
 	{
         printf("BSP Magneto Init Err:%d\r\n",drvStatus);
@@ -376,7 +376,7 @@ void MX_USART1_UART_Init(void)
     HAL_UART_Init(&huart1);
     
     /*##-2- Put UART peripheral in reception process ###########################*/  
-    if(HAL_UART_Receive_IT(&huart1, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+    if(HAL_UART_Receive_IT(&huart1, (uint8_t *)gRxBuffer, RXBUFFERSIZE) != HAL_OK)
     {
         printf("Uart Init Error\r\n");
     }             
@@ -396,7 +396,7 @@ void MX_USART2_UART_Init(void)
 	HAL_UART_Init(&huart2);
 	
     /*##-2- Put UART peripheral in reception process ###########################*/  
-    if(HAL_UART_Receive_IT(&huart2, (uint8_t *)g_aRxBuffer, RXBUFFERSIZE) != HAL_OK)
+    if(HAL_UART_Receive_IT(&huart2, (uint8_t *)gRxBuffer, RXBUFFERSIZE) != HAL_OK)
     {
         printf("Uart Init Error\r\n");
     }  	
