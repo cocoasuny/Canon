@@ -28,6 +28,10 @@ void sensor_management_task_handle(void *pvParameters)
 	BSP_GYRO_Sensor_Enable(gMEMSHandler.HandleGyroSensor);
 	BSP_MAGNETO_Sensor_Enable(gMEMSHandler.HandleMagSensor);
 
+    /* Set Accelerometer Full Scale to 2G,and Read the Acc Sensitivity */
+    set_2G_accelerometer_fullScale();
+    
+    
 	/* osxMotinFX init */
 	MotionFX_manager_init();
 	MotionFX_manager_start_9X();
@@ -96,7 +100,39 @@ void ble_send_motion_data(void)
 	AccGyroMag_Update(&ACC_Value,&GYR_Value,&MAG_Value);
 }
 
+/**
+  * @brief  This function sets the ACC FS to 2g
+  * @param  None
+  * @retval None
+  */
+void set_2G_accelerometer_fullScale(void)
+{
+    float sensitivity = 0;
+    
+    /* Set Full Scale to +/-2g */
+    BSP_ACCELERO_Set_FS_Value(gMEMSHandler.HandleAccSensor,2.0f);
 
+    /* Read the Acc Sensitivity */
+    BSP_ACCELERO_Get_Sensitivity(gMEMSHandler.HandleAccSensor,&sensitivity);
+    sensitivity_Mul = sensitivity * ((float) FROM_MG_TO_G);
+}
+
+/**
+  * @brief  This function dsets the ACC FS to 4g
+  * @param  None
+  * @retval None
+  */
+void set_4G_accelerometer_fullScale(void)
+{
+    float sensitivity = 0;
+    
+    /* Set Full Scale to +/-4g */
+    BSP_ACCELERO_Set_FS_Value(gMEMSHandler.HandleAccSensor,4.0f);
+
+    /* Read the Acc Sensitivity */
+    BSP_ACCELERO_Get_Sensitivity(gMEMSHandler.HandleAccSensor,&sensitivity);
+    sensitivity_Mul = sensitivity * ((float) FROM_MG_TO_G);
+}
 
 
 /************************ (C) COPYRIGHT Cocoasuny *****END OF FILE****/

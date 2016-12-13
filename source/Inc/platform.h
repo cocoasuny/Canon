@@ -50,6 +50,7 @@
 //#define Debug_Sensor_Press
 //#define Debug_Sensor_Temperature
 #define Debug_LedControl
+#define DEBUG_OSXMOTIONFX
 
 
 /* Package Version only numbers 0->9 */

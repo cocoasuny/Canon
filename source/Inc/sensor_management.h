@@ -22,12 +22,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-
+/* @brief  Scale factor. It is used to scale acceleration from mg to g */ 
+#define FROM_MG_TO_G    0.001
 
 /* extern functios declare ---------------------------------------------------*/
 void sensor_management_task_handle(void *pvParameters);
 void ble_send_environmental_data(void);
 void ble_send_motion_data(void);
+void set_2G_accelerometer_fullScale(void);
+void set_4G_accelerometer_fullScale(void);
 
 
 #endif /* __SENSOR_MANAGEMENT_H */

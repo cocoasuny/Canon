@@ -122,7 +122,9 @@ void MotionFX_manager_init(void)
 
 	if(!osx_MotionFX_initialize())
 	{
-		printf("osx_MotionFX_initialize err\r\n");
+        #ifdef DEBUG_OSXMOTIONFX
+            printf("osx_MotionFX_initialize err\r\n");
+        #endif
 	}
 
 	osx_MotionFX_compass_init();
