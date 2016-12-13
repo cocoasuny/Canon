@@ -27,13 +27,8 @@
 
 
 typedef __packed struct _hci_uart_pckt{
-<<<<<<< HEAD:Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes/hci_const.h
-  uint8_t type;
-  uint8_t data[VARIABLE_SIZE];
-=======
   uint8_t	type;
   uint8_t	data[VARIABLE_SIZE];
->>>>>>> 729d680cfbd77ab996f608a65d364da6bdf48aee:source/Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes/hci_const.h
 } PACKED hci_uart_pckt;
 #define HCI_HDR_SIZE 1
 
@@ -44,15 +39,9 @@ typedef __packed struct _hci_command_hdr{
 #define HCI_COMMAND_HDR_SIZE 	3
 
 typedef __packed struct _hci_event_pckt{
-<<<<<<< HEAD:Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes/hci_const.h
-  uint8_t evt;
-  uint8_t plen;
-  uint8_t data[VARIABLE_SIZE];
-=======
   uint8_t		evt;
   uint8_t		plen;
   uint8_t	    data[VARIABLE_SIZE];
->>>>>>> 729d680cfbd77ab996f608a65d364da6bdf48aee:source/Middlewares/ST/STM32_BlueNRG/SimpleBlueNRG_HCI/includes/hci_const.h
 } PACKED hci_event_pckt;
 #define HCI_EVENT_HDR_SIZE 	2
 
