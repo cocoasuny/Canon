@@ -64,6 +64,7 @@
 #include "bsp_magneto.h"
 #include "osx_motion_fx.h"
 #include "MotionFX_Manager.h"
+#include "cmu_protocol.h"
 
 
 

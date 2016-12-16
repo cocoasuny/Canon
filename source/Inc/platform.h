@@ -51,6 +51,7 @@
 //#define Debug_Sensor_Temperature
 #define Debug_LedControl
 #define DEBUG_OSXMOTIONFX
+#define DEBUG_APP_CONTROL			//App控制命令调试
 
 
 /* Package Version only numbers 0->9 */
@@ -61,6 +62,8 @@
 /* Define the BlueMicrosystem Name MUST be 7 char long */
 #define NAME_BLUEMS 'B','M','1','V',OSX_BMS_VERSION_MAJOR,OSX_BMS_VERSION_MINOR,OSX_BMS_VERSION_PATCH
 #define STM32_UUID ((uint32_t *)0x1FFF7590)
+/* STM32 MCU_ID */
+#define STM32_MCU_ID ((uint32_t *)0xE0042000)
 
 
 /* Shell Switch */
