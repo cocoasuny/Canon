@@ -25,10 +25,22 @@
  */
 void cmu_config_command_parsing(uint8_t * att_data, uint8_t data_length)
 {
-	uint32_t 			FeatureMask = (att_data[3]) | (att_data[2]<<8) | (att_data[1]<<16) | (att_data[0]<<24);
-	uint8_t 			Command = att_data[4];
-	uint8_t 			Data    = att_data[5];
+	uint32_t 				FeatureMask = (att_data[3]) | (att_data[2]<<8) | (att_data[1]<<16) | (att_data[0]<<24);
+	uint8_t 				Command = att_data[4];
+	uint8_t 				Data    = att_data[5];
+	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(300); /* 设置最大等待时间为 300ms */
+	SENSOR_MSG_T			sensorManageQueueMsgValue;
 
+	#ifdef DEBUG_APP_CONTROL
+		uint8_t	i=0;
+		printf("[App CMD]:");
+		for(i=0;i<data_length;i++)
+		{
+			printf("0x%x,",att_data[i]);
+		}
+		printf("\r\n");
+	#endif
+			
 	switch (FeatureMask)
 	{
 		case FEATURE_MASK_SENSORFUSION_SHORT:
@@ -55,7 +67,8 @@ void cmu_config_command_parsing(uint8_t * att_data, uint8_t data_length)
 						printf("Calibration RESET Signal For Feature=%lx\n\r",FeatureMask);
 					#endif /* OSX_BMS_DEBUG_CONNECTION */
 					/* Reset the calibration */
-//					ForceReCalibration=1;
+					sensorManageQueueMsgValue.eventID = EVENT_SENSOR_CALIBRATION;
+					xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
 				}
 				break;
 				case W2ST_COMMAND_CAL_STOP:

@@ -41,6 +41,10 @@ uint8_t  						gRxBuffer[RXBUFFERSIZE] = {0};
 MEMS_HANDLE_t					gMEMSHandler;
 osxMFX_calibFactor 				magOffset; 
 float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
+DEVICE_STATUS_T					gDevInfo;         //设备状态信息
+
+/* Global message event queue variables -------------------------------------*/
+QueueHandle_t                   sensorManageEventQueue = NULL; //event queue for sensor management
 
 
 /* Private variables ---------------------------------------------------------*/
@@ -71,7 +75,7 @@ void LedCtlTask(void *pvParameters);
 int main(void)
 {
     /* MCU Configuration----------------------------------------------------------*/
-
+	gDevInfo.bleStatus = DISCONNECT;
     /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
     HAL_Init();
 

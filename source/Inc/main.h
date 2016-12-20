@@ -85,6 +85,10 @@ extern FIL  MyFile;     /* File object */
 extern MEMS_HANDLE_t					gMEMSHandler;
 extern osxMFX_calibFactor 				magOffset; 
 extern float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
+extern DEVICE_STATUS_T					gDevInfo;         //设备状态信息
+
+/* global message event queue declare ------------------------------------------*/
+extern QueueHandle_t					sensorManageEventQueue; //event queue for sensor management
 
 void MX_GPIO_Init(void);
 void MX_SDIO_SD_Init(void);

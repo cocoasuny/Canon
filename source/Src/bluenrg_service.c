@@ -434,7 +434,7 @@ static void Read_Request_CB(uint16_t handle)
  */
 void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 {  
-	//  connected = TRUE;
+	gDevInfo.bleStatus = CONNECT;
 	connection_handle = handle;
 
 	printf("Connected to device:");
@@ -451,7 +451,7 @@ void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
  */
 void GAP_DisconnectionComplete_CB(void)
 {
-//  connected = FALSE;
+	gDevInfo.bleStatus = DISCONNECT;
 	printf("Disconnected\r\n");
 //  /* Make the device connectable again. */
 //  set_connectable = TRUE;
@@ -468,26 +468,9 @@ void GAP_DisconnectionComplete_CB(void)
  */
 void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_data, uint8_t offset)
 {
-	uint8_t i = 0;
-	#ifdef DEBUG_APP_CONTROL
-		printf("[App CMD]:%d\r\n",data_length);
-		for(i=0;i<data_length;i++)
-		{
-			printf("0x%x,",att_data[i]);
-		}
-		printf("\r\n");
-	#endif
 	/* If GATT client has modified 'ConfigCharHandle' value */
 	if(handle == ConfigCharHandle + 1)
 	{   
-		#ifdef DEBUG_APP_CONTROL
-			printf("[App CMD]:%d\r\n",data_length);
-			for(i=0;i<data_length;i++)
-			{
-				printf("0x%x,",att_data[i]);
-			}
-			printf("\r\n");
-		#endif
 		cmu_config_command_parsing(att_data, data_length);
 	}
 	else if (handle == TermCharHandle + 1)  //Terminal characteristic

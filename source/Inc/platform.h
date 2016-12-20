@@ -52,6 +52,7 @@
 #define Debug_LedControl
 #define DEBUG_OSXMOTIONFX
 #define DEBUG_APP_CONTROL			//App控制命令调试
+#define DEBUG_SENSOR_MANAGEMENT		//
 
 
 /* Package Version only numbers 0->9 */
@@ -73,6 +74,15 @@
 
 #define RXBUFFERSIZE          1
 
+
+
+/* sensor data updata frequence define */
+#define SENSOR_DATA_UPDATE_TIMER_FREQ					(pdMS_TO_TICKS(1))  //最大1000/1 Hz输出频率
+#define ENVIRONMENTAL_DATA_UPDATE_FREQ					(1)   //Hz
+#define MOTION_DATA_UPDATE_FREQ							(10) //Hz
+
+
+
 /******** Task define ********************/
 /* BlueNRG HCI Process Task */
 #define Task_BlueNRGHCI_Stack        500    //task stack
@@ -82,6 +92,8 @@
 #define TASK_SENSOR_MANAGEMENT_PRIORITY			4
 
 
+/******* Message queue defien *************/
+#define SENSOR_EVENT_QUEUE_SIZE	10
 
 #ifdef PRINTFLOG
     #define Log  printf

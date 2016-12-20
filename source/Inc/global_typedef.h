@@ -143,7 +143,36 @@ typedef struct
   void *HandleMagSensor;
 }MEMS_HANDLE_t;
 
+/**
+ * @brief  sensor management event structure definition
+ */
+typedef enum
+{
+	EVENT_SENSOR_DEFAULT=0,
+	EVENT_SENSOR_CALIBRATION,
+	EVENT_SENSOR_ENVIRONMENT_DATA_UPDATE,
+	EVENT_SENSOR_MOTION_DATA_UPDATA
+}SENSOR_MANAGE_EVENT_ID_T;
+/**
+ * @brief  sensor management message structure definition
+ */
+typedef struct
+{
+	SENSOR_MANAGE_EVENT_ID_T		eventID;			
+}SENSOR_MSG_T;
 
+typedef enum
+{
+	CONNECT = 0,
+	DISCONNECT
+}BLE_STATUS;
+/**
+ * @brief  device information structure definition
+ */
+typedef struct
+{
+	BLE_STATUS bleStatus;
+}DEVICE_STATUS_T;
 
 #endif /* __GLOBALTYPEDEF_H */
 
