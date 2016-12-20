@@ -79,7 +79,8 @@
 /* sensor data updata frequence define */
 #define SENSOR_DATA_UPDATE_TIMER_FREQ					(pdMS_TO_TICKS(1))  //最大1000/1 Hz输出频率
 #define ENVIRONMENTAL_DATA_UPDATE_FREQ					(1)   //Hz
-#define MOTION_DATA_UPDATE_FREQ							(10) //Hz
+#define MOTION_DATA_UPDATE_FREQ							(10)  //Hz
+#define MOTION_DATA_FUSION_FREQ							(10)  //Hz
 
 
 

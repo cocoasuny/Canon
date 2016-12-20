@@ -23,11 +23,15 @@
 static void ReCalibration(void);
 static unsigned char RecallCalibrationFromMemory(void);
 static unsigned char ResetCalibrationInMemory(void);
+static unsigned char SaveCalibrationToMemory(void);
 static void vSensorDataUpdateTimerCallback( TimerHandle_t pxTimer );
+static void compute_quaternions(void);
+
 
 /* private variables declare -------------------------------------------------*/
 static bool isCal = false;
 static uint32_t CalibrationStructureRAM[8]={0};
+static float sensitivity = 0;
 
 /**
   * @brief  sensor management task handler
@@ -107,6 +111,14 @@ void sensor_management_task_handle(void *pvParameters)
 						ble_send_motion_data();
 					}
 					break;
+					case EVENT_SNESOR_MOTION_DATA_FUSION:
+					{
+						#ifdef DEBUG_SENSOR_MANAGEMENT
+							//printf("motion data fusion\r\n");
+						#endif		
+						compute_quaternions();
+					}
+					break;
 					default:break;
 				}
 			}
@@ -127,8 +139,10 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(10); /* 设置最大等待时间为 10ms */
 	uint16_t				envDataCntCtl = (1000 / ENVIRONMENTAL_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
 	uint16_t				motionDataCntCtl = (1000 / MOTION_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
+	uint16_t				motionDataFusionCntCtl = (1000/MOTION_DATA_FUSION_FREQ*SENSOR_DATA_UPDATE_TIMER_FREQ);
 	static uint16_t			envDataCnt = 0;		//环境传感器数据上传频率计数
 	static uint16_t			motionDataCnt = 0;	//运动原始数据上传频率计数	
+	static uint16_t			motionDataFusionCnt = 0; //运动数据融合频率计数
 	
 	pxTimer = pxTimer;
 	sensorManageQueueMsgValue.eventID = EVENT_SENSOR_DEFAULT;
@@ -138,6 +152,7 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 		/* increase the conters */
 		envDataCnt++;
 		motionDataCnt++;
+		motionDataFusionCnt++;
 		
 		if(envDataCnt >= envDataCntCtl)  //update the environment data
 		{
@@ -151,6 +166,13 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 			motionDataCnt = 0;
 			sensorManageQueueMsgValue.eventID = EVENT_SENSOR_MOTION_DATA_UPDATA;
 			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);		
+		}
+		
+		if(motionDataFusionCnt >= motionDataFusionCntCtl)// motion data fusion
+		{
+			motionDataFusionCnt = 0;
+			sensorManageQueueMsgValue.eventID = EVENT_SNESOR_MOTION_DATA_FUSION;
+			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);				
 		}
 	}
 }
@@ -217,9 +239,7 @@ void ble_send_motion_data(void)
   * @retval None
   */
 void set_2G_accelerometer_fullScale(void)
-{
-    float sensitivity = 0;
-    
+{    
     /* Set Full Scale to +/-2g */
     BSP_ACCELERO_Set_FS_Value(gMEMSHandler.HandleAccSensor,2.0f);
 
@@ -321,8 +341,137 @@ static unsigned char ResetCalibrationInMemory(void)
 
 	return Success;
 }
+/**
+ * @brief  Save the Magnetometer Calibration Values to Memory
+ * @param uint32_t *MagnetoCalibration the Magneto Calibration
+ * @retval unsigned char Success/Not Success
+ */
+static unsigned char SaveCalibrationToMemory(void)
+{
+	unsigned char Success=1;
 
+	/* Reset Before The data in Memory */
+	Success = ResetCalibrationInMemory();
 
+	if(Success) 
+	{
+		/* Store in RAM */
+		CalibrationStructureRAM[0] = OSXMOTIONFX_CHECK_CALIBRATION;
+		CalibrationStructureRAM[1] = (uint32_t) magOffset.magOffX;
+		CalibrationStructureRAM[2] = (uint32_t) magOffset.magOffY;
+		CalibrationStructureRAM[3] = (uint32_t) magOffset.magOffZ;
+		
+		memcpy(&(CalibrationStructureRAM[4]), &magOffset.magGainX, sizeof(uint32_t));
+		memcpy(&(CalibrationStructureRAM[5]), &magOffset.magGainY, sizeof(uint32_t));
+		memcpy(&(CalibrationStructureRAM[6]), &magOffset.magGainZ, sizeof(uint32_t));
+		memcpy(&(CalibrationStructureRAM[7]), &magOffset.expMagVect, sizeof(uint32_t));
+		
+		#ifdef DEBUG_SENSOR_MANAGEMENT
+			printf("Magneto Calibration will be saved in FLASH\r\n");
+		#endif		
+	}
+
+	return Success;
+}
+
+/**
+ * @brief  osxMotionFX Working function
+ * @param  None
+ * @retval None
+ */
+static void compute_quaternions(void)
+{
+	SensorAxes_t 					quat_axes[SEND_N_QUATERNIONS];
+	static int32_t 					calibIndex =0;
+	static int32_t 					CounterFX  =0;
+	SensorAxes_t 					ACC_Value;
+	SensorAxesRaw_t 				ACC_Value_Raw;
+	SensorAxes_t 					GYR_Value;
+	SensorAxes_t 					MAG_Value;
+
+	/* Incremente the Counter */
+	CounterFX++;
+
+	/* Read the Acc RAW values */
+	BSP_ACCELERO_Get_AxesRaw(gMEMSHandler.HandleAccSensor,&ACC_Value_Raw);
+
+	/* Read the Magneto values */
+	BSP_MAGNETO_Get_Axes(gMEMSHandler.HandleMagSensor,&MAG_Value);
+
+	/* Read the Gyro values */
+	BSP_GYRO_Get_Axes(gMEMSHandler.HandleGyroSensor,&GYR_Value);
+
+	MotionFX_manager_run(ACC_Value_Raw,GYR_Value,MAG_Value);
+
+	/* Check if is calibrated */
+	if(isCal!=true)
+	{
+		/* Run Compass Calibration @ 25Hz */
+		calibIndex++;
+		if (calibIndex == 4)
+		{
+			calibIndex = 0;
+			ACC_Value.AXIS_X = (int32_t)(ACC_Value_Raw.AXIS_X * sensitivity);
+			ACC_Value.AXIS_Y = (int32_t)(ACC_Value_Raw.AXIS_Y * sensitivity);
+			ACC_Value.AXIS_Z = (int32_t)(ACC_Value_Raw.AXIS_Z * sensitivity);
+			osx_MotionFX_compass_saveAcc(ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);	/* Accelerometer data ENU systems coordinate	*/
+			osx_MotionFX_compass_saveMag(MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);	/* Magnetometer  data ENU systems coordinate	*/            
+			osx_MotionFX_compass_run();
+
+			/* Control the calibration status */
+			isCal = osx_MotionFX_compass_isCalibrated();
+			if(isCal == true)
+			{
+				#ifdef DEBUG_SENSOR_MANAGEMENT
+					printf("Compass Calibrated\n\r");
+				#endif				
+
+				/* Get new magnetometer offset */
+				osx_MotionFX_getCalibrationData(&magOffset);
+
+				/* Save the calibration in Memory */
+				SaveCalibrationToMemory();
+
+				/* Notifications of Compass Calibration */
+				Calib_Notify(FEATURE_MASK_SENSORFUSION_SHORT,W2ST_COMMAND_CAL_STATUS,isCal);
+			}
+		}
+	}
+	else 
+	{
+		calibIndex=0;
+	}
+
+	/* Read the quaternions */
+	osxMFX_output *MotionFX_Engine_Out = MotionFX_manager_getDataOUT();
+
+	/* Scaling quaternions data by a factor of 10000
+	(Scale factor to handle float during data transfer BT) */
+	{
+		int32_t QuaternionNumber = (CounterFX>SEND_N_QUATERNIONS) ? (SEND_N_QUATERNIONS-1) : (CounterFX-1);
+
+		/* Save the quaternions values */
+		if(MotionFX_Engine_Out->quaternion_9X[3] < 0)
+		{
+			quat_axes[QuaternionNumber].AXIS_X = (int32_t)(MotionFX_Engine_Out->quaternion_9X[0] * (-10000));
+			quat_axes[QuaternionNumber].AXIS_Y = (int32_t)(MotionFX_Engine_Out->quaternion_9X[1] * (-10000));
+			quat_axes[QuaternionNumber].AXIS_Z = (int32_t)(MotionFX_Engine_Out->quaternion_9X[2] * (-10000));
+		} 
+		else 
+		{
+			quat_axes[QuaternionNumber].AXIS_X = (int32_t)(MotionFX_Engine_Out->quaternion_9X[0] * 10000);
+			quat_axes[QuaternionNumber].AXIS_Y = (int32_t)(MotionFX_Engine_Out->quaternion_9X[1] * 10000);
+			quat_axes[QuaternionNumber].AXIS_Z = (int32_t)(MotionFX_Engine_Out->quaternion_9X[2] * 10000);
+		}
+	}
+
+	/* Every QUAT_UPDATE_MUL_10MS*10 mSeconds Send Quaternions informations via bluetooth */
+	if(CounterFX==10)
+	{
+		Quat_Update(quat_axes);
+		CounterFX=0;
+	}
+}
 
 
 

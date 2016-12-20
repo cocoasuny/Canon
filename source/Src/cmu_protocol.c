@@ -56,8 +56,8 @@ void cmu_config_command_parsing(uint8_t * att_data, uint8_t data_length)
 					/* Replay with the calibration status for the feature */
 					/* Control the calibration status */
 					{
-						unsigned char isCal = osx_MotionFX_compass_isCalibrated();
-						Calib_Notify(FeatureMask,Command,isCal);
+						unsigned char calStatus = osx_MotionFX_compass_isCalibrated();
+						Calib_Notify(FeatureMask,Command,calStatus);
 					}
 				}
 				break;
