@@ -74,13 +74,29 @@
 
 #define RXBUFFERSIZE          1
 
+/* BLE Characteristic connection control */
+#define W2ST_CONNECT_ENV           	(1    )		// Environmental Data 
+#define W2ST_CONNECT_LED           	(1<<1 )		// LED status 
+#define W2ST_CONNECT_ACC_GYRO_MAG  	(1<<2 )		// Acceleration/Gyroscope/Magneto 
+#define W2ST_CONNECT_QUAT          	(1<<3 )		// Quaternions 
+#define W2ST_CONNECT_AR            	(1<<4 )		// Activity Recognition 
+#define W2ST_CONNECT_CP            	(1<<5 )     // Carry Position Recognition 
+#define W2ST_CONNECT_GR          	(1<<6 )		// Gesture Recognition
+#define W2ST_CONNECT_PM          	(1<<7 )		// Pedometer SW 
+#define W2ST_CONNECT_STD_TERM      	(1<<8 )		// Standard Terminal 
+#define W2ST_CONNECT_STD_ERR       	(1<<9 )		// Standard Error 
+#define W2ST_CONNECT_ACC_EVENT     	(1<<10)		// HW Advance Features 
+#define W2ST_CONNECT_GG_EVENT      	(1<<11)		// Gas Gouge Feature 
 
+#define W2ST_CHECK_CONNECTION(BleChar) ((ConnectionBleStatus&(BleChar)) ? 1 : 0)
+#define W2ST_ON_CONNECTION(BleChar)    (ConnectionBleStatus|=(BleChar))
+#define W2ST_OFF_CONNECTION(BleChar)   (ConnectionBleStatus&=(~BleChar))
 
 /* sensor data updata frequence define */
-#define SENSOR_DATA_UPDATE_TIMER_FREQ					(pdMS_TO_TICKS(1))  //最大1000/1 Hz输出频率
+#define SENSOR_DATA_UPDATE_TIMER_FREQ					(pdMS_TO_TICKS(10))  //最大1000/1 Hz输出频率
 #define ENVIRONMENTAL_DATA_UPDATE_FREQ					(1)   //Hz
 #define MOTION_DATA_UPDATE_FREQ							(10)  //Hz
-#define MOTION_DATA_FUSION_FREQ							(10)  //Hz
+#define MOTION_DATA_FUSION_FREQ							(100)  //Hz
 
 
 

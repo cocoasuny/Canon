@@ -42,6 +42,7 @@ MEMS_HANDLE_t					gMEMSHandler;
 osxMFX_calibFactor 				magOffset; 
 float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
 DEVICE_STATUS_T					gDevInfo;         //设备状态信息
+uint32_t 						ConnectionBleStatus  =0;  //蓝牙连接状态（需要通过蓝牙控制的设备状态）
 
 /* Global message event queue variables -------------------------------------*/
 QueueHandle_t                   sensorManageEventQueue = NULL; //event queue for sensor management
@@ -148,12 +149,6 @@ void LedCtlTask(void *pvParameters)
 #endif			
         BSP_LED_Toggle();
         
-        /* for test */
-        gAxesData.AXIS_X += 100;
-        gAxesData.AXIS_Y += 100;
-        gAxesData.AXIS_Z += 100;
-//        BlueNRG_Update_Acc((AxesRaw_t*)&gAxesData);
-		
         vTaskDelay(gLedFlashTime);     //控制LDE闪烁频率
     }
 }

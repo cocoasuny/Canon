@@ -139,7 +139,8 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(10); /* 设置最大等待时间为 10ms */
 	uint16_t				envDataCntCtl = (1000 / ENVIRONMENTAL_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
 	uint16_t				motionDataCntCtl = (1000 / MOTION_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
-	uint16_t				motionDataFusionCntCtl = (1000/MOTION_DATA_FUSION_FREQ*SENSOR_DATA_UPDATE_TIMER_FREQ);
+//	uint16_t				motionDataFusionCntCtl = (1000/MOTION_DATA_FUSION_FREQ*SENSOR_DATA_UPDATE_TIMER_FREQ);
+	uint16_t				motionDataFusionCntCtl = (1000/1000*SENSOR_DATA_UPDATE_TIMER_FREQ);
 	static uint16_t			envDataCnt = 0;		//环境传感器数据上传频率计数
 	static uint16_t			motionDataCnt = 0;	//运动原始数据上传频率计数	
 	static uint16_t			motionDataFusionCnt = 0; //运动数据融合频率计数
@@ -157,22 +158,28 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 		if(envDataCnt >= envDataCntCtl)  //update the environment data
 		{
 			envDataCnt = 0;
-			sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ENVIRONMENT_DATA_UPDATE;
-			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
+			if(W2ST_CHECK_CONNECTION(W2ST_CONNECT_ENV))
+			{
+				sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ENVIRONMENT_DATA_UPDATE;
+				xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
+			}
 		}
 		
 		if(motionDataCnt >= motionDataCntCtl) //update the motion data
 		{
 			motionDataCnt = 0;
 			sensorManageQueueMsgValue.eventID = EVENT_SENSOR_MOTION_DATA_UPDATA;
-			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);		
+//			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);		
 		}
 		
 		if(motionDataFusionCnt >= motionDataFusionCntCtl)// motion data fusion
 		{
 			motionDataFusionCnt = 0;
-			sensorManageQueueMsgValue.eventID = EVENT_SNESOR_MOTION_DATA_FUSION;
-			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);				
+			if(W2ST_CHECK_CONNECTION(W2ST_CONNECT_QUAT))
+			{
+				sensorManageQueueMsgValue.eventID = EVENT_SNESOR_MOTION_DATA_FUSION;
+				xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
+			}				
 		}
 	}
 }
@@ -389,6 +396,8 @@ static void compute_quaternions(void)
 	SensorAxes_t 					GYR_Value;
 	SensorAxes_t 					MAG_Value;
 
+	uint32_t	time = 0;
+	time = HAL_GetTick();
 	/* Incremente the Counter */
 	CounterFX++;
 
@@ -471,6 +480,7 @@ static void compute_quaternions(void)
 		Quat_Update(quat_axes);
 		CounterFX=0;
 	}
+	printf("time:%d,%d\r\n",HAL_GetTick(),(HAL_GetTick()-time));
 }
 
 

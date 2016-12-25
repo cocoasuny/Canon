@@ -283,7 +283,7 @@ tBleStatus Start_Advertise(void)
 	/* disable scan response */
 	hci_le_set_scan_resp_data(0,NULL);  
 	ret = aci_gap_set_discoverable(ADV_IND, 0, 0, STATIC_RANDOM_ADDR, NO_WHITE_LIST_USE,
-                                 sizeof(local_name), local_name, 0, NULL, 0, 0);  
+                                 sizeof(local_name), local_name, 0, NULL, 0x0000, 0x0000);  
 	/* Send Advertising data */
 	aci_gap_update_adv_data(26, manuf_data);
 	
@@ -436,6 +436,7 @@ void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 {  
 	gDevInfo.bleStatus = CONNECT;
 	connection_handle = handle;
+	ConnectionBleStatus = 0;
 
 	printf("Connected to device:");
 	for(int i = 5; i > 0; i--)
@@ -452,6 +453,7 @@ void GAP_ConnectionComplete_CB(uint8_t addr[6], uint16_t handle)
 void GAP_DisconnectionComplete_CB(void)
 {
 	gDevInfo.bleStatus = DISCONNECT;
+	ConnectionBleStatus=0;
 	printf("Disconnected\r\n");
 //  /* Make the device connectable again. */
 //  set_connectable = TRUE;
@@ -477,6 +479,33 @@ void Attribute_Modified_CB(uint16_t handle, uint8_t data_length, uint8_t *att_da
 	{
 		/* Received one write from Client on Terminal characteristc */
 		debug_console_command_parsing(att_data,data_length);
+	}
+	else if(handle == EnvironmentalCharHandle + 2)
+	{
+		if(att_data[0] == 01)
+		{
+			W2ST_ON_CONNECTION(W2ST_CONNECT_ENV);
+		}
+		else if (att_data[0] == 0)
+		{
+			W2ST_OFF_CONNECTION(W2ST_CONNECT_ENV);
+		}
+			
+	}
+	else if(handle == QuaternionsCharHandle + 2)
+	{
+		if(att_data[0] == 01)
+		{
+			W2ST_ON_CONNECTION(W2ST_CONNECT_QUAT);
+		}
+		else if (att_data[0] == 0)
+		{
+			W2ST_OFF_CONNECTION(W2ST_CONNECT_QUAT);
+		}
+	}
+	else 
+	{
+		printf("Att Modified\r\n");
 	}
 }
 /**
