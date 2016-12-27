@@ -65,6 +65,7 @@
 #include "osx_motion_fx.h"
 #include "MotionFX_Manager.h"
 #include "cmu_protocol.h"
+#include "bsp_timer.h"
 
 
 
@@ -87,6 +88,7 @@ extern osxMFX_calibFactor 				magOffset;
 extern float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
 extern DEVICE_STATUS_T					gDevInfo;         //设备状态信息
 extern uint32_t 						ConnectionBleStatus;  //蓝牙连接状态（需要通过蓝牙控制的设备状态）
+extern TIM_HandleTypeDef    			gSensorManagementTimHandle;
 
 /* global message event queue declare ------------------------------------------*/
 extern QueueHandle_t					sensorManageEventQueue; //event queue for sensor management

@@ -563,6 +563,11 @@
               <FileType>1</FileType>
               <FilePath>..\source\Src\bsp_magneto.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\source\Src\bsp_timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

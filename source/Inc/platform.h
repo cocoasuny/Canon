@@ -92,11 +92,17 @@
 #define W2ST_ON_CONNECTION(BleChar)    (ConnectionBleStatus|=(BleChar))
 #define W2ST_OFF_CONNECTION(BleChar)   (ConnectionBleStatus&=(~BleChar))
 
-/* sensor data updata frequence define */
-#define SENSOR_DATA_UPDATE_TIMER_FREQ					(pdMS_TO_TICKS(10))  //最大1000/1 Hz输出频率
-#define ENVIRONMENTAL_DATA_UPDATE_FREQ					(1)   //Hz
-#define MOTION_DATA_UPDATE_FREQ							(10)  //Hz
-#define MOTION_DATA_FUSION_FREQ							(100)  //Hz
+/* sensor data management resource define */
+#define SENSOR_MANAGEMENT_TIMER							TIM3
+#define SENSOR_MANAGEMENT_TIM_CLK_ENABLE()				__HAL_RCC_TIM3_CLK_ENABLE();
+#define	SENSOR_MANAGEMENT_TIM_IRQn						TIM3_IRQn
+#define	SENSOR_MANAGEMENT_TIM_IRQHandler				TIM3_IRQHandler
+#define SEMSOR_MANAGEMENT_PREPTY						0x0F
+#define SEMSOR_MANAGEMENT_SUBPTY						0
+#define SENSOR_DATA_UPDATE_TIMER_FREQ					(1000)  //最大1000/1 Hz输出频率
+#define ENVIRONMENTAL_DATA_UPDATE_FREQ					(1)   	//Hz
+#define MOTION_DATA_UPDATE_FREQ							(10)  	//Hz
+#define MOTION_DATA_FUSION_FREQ							(100)  	//Hz
 
 
 

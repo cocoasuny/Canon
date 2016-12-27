@@ -197,4 +197,14 @@ void BNRG_SPI_EXTI_IRQHandler(void)
     HAL_GPIO_EXTI_IRQHandler(BNRG_SPI_EXTI_PIN);
 }
 
+/**
+  * @brief  This function handles TIM interrupt request.
+  * @param  None
+  * @retval None
+  */
+void SENSOR_MANAGEMENT_TIM_IRQHandler(void)
+{
+	HAL_TIM_IRQHandler(&gSensorManagementTimHandle);
+}
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

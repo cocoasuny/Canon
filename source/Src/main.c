@@ -43,6 +43,7 @@ osxMFX_calibFactor 				magOffset;
 float 							sensitivity_Mul;  /* Acc sensitivity multiply by FROM_MG_TO_G constant */
 DEVICE_STATUS_T					gDevInfo;         //设备状态信息
 uint32_t 						ConnectionBleStatus  =0;  //蓝牙连接状态（需要通过蓝牙控制的设备状态）
+TIM_HandleTypeDef    			gSensorManagementTimHandle;
 
 /* Global message event queue variables -------------------------------------*/
 QueueHandle_t                   sensorManageEventQueue = NULL; //event queue for sensor management

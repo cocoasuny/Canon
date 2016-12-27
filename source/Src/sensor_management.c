@@ -73,6 +73,7 @@ void sensor_management_task_handle(void *pvParameters)
 	RecallCalibrationFromMemory();
 
 	/* creat a timer for sensor data update control */
+	bsp_sensor_management_timer_init();
 	xSensorDataUpdateTimer = xTimerCreate("MEMSTim",SENSOR_DATA_UPDATE_TIMER_FREQ,pdTRUE,(void *)1,vSensorDataUpdateTimerCallback);
 	if(xSensorDataUpdateTimer != NULL)
 	{
@@ -140,7 +141,7 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 	uint16_t				envDataCntCtl = (1000 / ENVIRONMENTAL_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
 	uint16_t				motionDataCntCtl = (1000 / MOTION_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
 //	uint16_t				motionDataFusionCntCtl = (1000/MOTION_DATA_FUSION_FREQ*SENSOR_DATA_UPDATE_TIMER_FREQ);
-	uint16_t				motionDataFusionCntCtl = (1000/1000*SENSOR_DATA_UPDATE_TIMER_FREQ);
+	uint16_t				motionDataFusionCntCtl = 10;
 	static uint16_t			envDataCnt = 0;		//环境传感器数据上传频率计数
 	static uint16_t			motionDataCnt = 0;	//运动原始数据上传频率计数	
 	static uint16_t			motionDataFusionCnt = 0; //运动数据融合频率计数
@@ -413,43 +414,43 @@ static void compute_quaternions(void)
 	MotionFX_manager_run(ACC_Value_Raw,GYR_Value,MAG_Value);
 
 	/* Check if is calibrated */
-	if(isCal!=true)
-	{
-		/* Run Compass Calibration @ 25Hz */
-		calibIndex++;
-		if (calibIndex == 4)
-		{
-			calibIndex = 0;
-			ACC_Value.AXIS_X = (int32_t)(ACC_Value_Raw.AXIS_X * sensitivity);
-			ACC_Value.AXIS_Y = (int32_t)(ACC_Value_Raw.AXIS_Y * sensitivity);
-			ACC_Value.AXIS_Z = (int32_t)(ACC_Value_Raw.AXIS_Z * sensitivity);
-			osx_MotionFX_compass_saveAcc(ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);	/* Accelerometer data ENU systems coordinate	*/
-			osx_MotionFX_compass_saveMag(MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);	/* Magnetometer  data ENU systems coordinate	*/            
-			osx_MotionFX_compass_run();
+//	if(isCal!=true)
+//	{
+//		/* Run Compass Calibration @ 25Hz */
+//		calibIndex++;
+//		if (calibIndex == 4)
+//		{
+//			calibIndex = 0;
+//			ACC_Value.AXIS_X = (int32_t)(ACC_Value_Raw.AXIS_X * sensitivity);
+//			ACC_Value.AXIS_Y = (int32_t)(ACC_Value_Raw.AXIS_Y * sensitivity);
+//			ACC_Value.AXIS_Z = (int32_t)(ACC_Value_Raw.AXIS_Z * sensitivity);
+//			osx_MotionFX_compass_saveAcc(ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);	/* Accelerometer data ENU systems coordinate	*/
+//			osx_MotionFX_compass_saveMag(MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);	/* Magnetometer  data ENU systems coordinate	*/            
+//			osx_MotionFX_compass_run();
 
-			/* Control the calibration status */
-			isCal = osx_MotionFX_compass_isCalibrated();
-			if(isCal == true)
-			{
-				#ifdef DEBUG_SENSOR_MANAGEMENT
-					printf("Compass Calibrated\n\r");
-				#endif				
+//			/* Control the calibration status */
+//			isCal = osx_MotionFX_compass_isCalibrated();
+//			if(isCal == true)
+//			{
+//				#ifdef DEBUG_SENSOR_MANAGEMENT
+//					printf("Compass Calibrated\n\r");
+//				#endif				
 
-				/* Get new magnetometer offset */
-				osx_MotionFX_getCalibrationData(&magOffset);
+//				/* Get new magnetometer offset */
+//				osx_MotionFX_getCalibrationData(&magOffset);
 
-				/* Save the calibration in Memory */
-				SaveCalibrationToMemory();
+//				/* Save the calibration in Memory */
+//				SaveCalibrationToMemory();
 
-				/* Notifications of Compass Calibration */
-				Calib_Notify(FEATURE_MASK_SENSORFUSION_SHORT,W2ST_COMMAND_CAL_STATUS,isCal);
-			}
-		}
-	}
-	else 
-	{
-		calibIndex=0;
-	}
+//				/* Notifications of Compass Calibration */
+//				Calib_Notify(FEATURE_MASK_SENSORFUSION_SHORT,W2ST_COMMAND_CAL_STATUS,isCal);
+//			}
+//		}
+//	}
+//	else 
+//	{
+//		calibIndex=0;
+//	}
 
 	/* Read the quaternions */
 	osxMFX_output *MotionFX_Engine_Out = MotionFX_manager_getDataOUT();
@@ -475,7 +476,7 @@ static void compute_quaternions(void)
 	}
 
 	/* Every QUAT_UPDATE_MUL_10MS*10 mSeconds Send Quaternions informations via bluetooth */
-	if(CounterFX==10)
+	if(CounterFX>=10)
 	{
 		Quat_Update(quat_axes);
 		CounterFX=0;

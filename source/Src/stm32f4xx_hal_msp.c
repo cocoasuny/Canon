@@ -34,6 +34,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
 #include "bsp_driver_sd.h"
+#include "main.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -257,6 +258,32 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
   HAL_PWR_DisableBkUpAccess();
   __HAL_RCC_PWR_CLK_DISABLE();
   
+}
+
+
+/**
+  * @brief TIM MSP Initialization 
+  *        This function configures the hardware resources used in this example: 
+  *           - Peripheral's clock enable
+  *           - Peripheral's GPIO Configuration  
+  * @param htim: TIM handle pointer
+  * @retval None
+  */
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
+{
+	if(gSensorManagementTimHandle.Instance == htim->Instance)
+	{
+		/*##-1- Enable peripherals and GPIO Clocks #################################*/
+		/* TIMx Peripheral clock enable */
+		SENSOR_MANAGEMENT_TIM_CLK_ENABLE();
+
+		/*##-2- Configure the NVIC for TIMx ########################################*/
+		/* Set Interrupt Group Priority */ 
+		HAL_NVIC_SetPriority(SENSOR_MANAGEMENT_TIM_IRQn, SEMSOR_MANAGEMENT_PREPTY, SEMSOR_MANAGEMENT_SUBPTY);
+
+		/* Enable the TIMx global Interrupt */
+		HAL_NVIC_EnableIRQ(SENSOR_MANAGEMENT_TIM_IRQn);
+	}
 }
 
 /* USER CODE BEGIN 1 */
