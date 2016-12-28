@@ -148,7 +148,7 @@ void LedCtlTask(void *pvParameters)
 #ifdef SHELL_ENABLE			
 		Shell_ProcessorHandler();     //Shell处理函数
 #endif			
-        BSP_LED_Toggle();
+//        BSP_LED_Toggle();
         
         vTaskDelay(gLedFlashTime);     //控制LDE闪烁频率
     }

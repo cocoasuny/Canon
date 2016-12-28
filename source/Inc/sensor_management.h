@@ -31,6 +31,7 @@ void ble_send_environmental_data(void);
 void ble_send_motion_data(void);
 void set_2G_accelerometer_fullScale(void);
 void set_4G_accelerometer_fullScale(void);
+void vSensorDataUpdateTimerCallback(void);
 
 
 #endif /* __SENSOR_MANAGEMENT_H */

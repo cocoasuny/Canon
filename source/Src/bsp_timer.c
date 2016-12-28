@@ -31,7 +31,7 @@ void bsp_sensor_management_timer_init(void)
 		In this example TIM3 input clock (TIM3CLK) is set to 2 * APB1 clock (PCLK1), 
 		since APB1 prescaler is different from 1.   
 		TIM3CLK = 2 * PCLK1  
-		PCLK1 = HCLK / 2 
+		PCLK1 = HCLK / 4 
 		=> TIM3CLK = HCLK = SystemCoreClock
 		To get TIM3 counter clock at 10 KHz, the Prescaler is computed as following:
 		Prescaler = (TIM3CLK / TIM3 counter clock) - 1
@@ -48,7 +48,7 @@ void bsp_sensor_management_timer_init(void)
 	----------------------------------------------------------------------- */  
 
 	/* Compute the prescaler value to have TIM3 counter clock equal to 1 KHz */
-	uwPrescalerValue = (uint32_t) ((SystemCoreClock / SENSOR_DATA_UPDATE_TIMER_FREQ) - 1);
+	uwPrescalerValue = (uint32_t) (((SystemCoreClock / 2) / SENSOR_DATA_UPDATE_TIMER_FREQ) - 1);
 
 	/* Set TIMx instance */
 	gSensorManagementTimHandle.Instance = SENSOR_MANAGEMENT_TIMER;
@@ -59,7 +59,7 @@ void bsp_sensor_management_timer_init(void)
 	+ ClockDivision = 0
 	+ Counter direction = Up
 	*/
-	gSensorManagementTimHandle.Init.Period = SENSOR_DATA_UPDATE_TIMER_FREQ - 1;
+	gSensorManagementTimHandle.Init.Period = 1;
 	gSensorManagementTimHandle.Init.Prescaler = uwPrescalerValue;
 	gSensorManagementTimHandle.Init.ClockDivision = 0;
 	gSensorManagementTimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -89,16 +89,11 @@ void bsp_sensor_management_timer_init(void)
   */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	static uint8_t cnt = 0;
-	static uint32_t	time = 0;
-
-	cnt++;
-	if(cnt >=10)
-	{
-		printf("timer:%d\r\n",HAL_GetTick() - time);
-		cnt = 0;
-		time = HAL_GetTick();
-	}
+    if(gSensorManagementTimHandle.Instance == htim->Instance)
+    {
+        /* update the sensor data */
+        vSensorDataUpdateTimerCallback();
+    }
 }
 
 

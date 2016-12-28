@@ -24,7 +24,6 @@ static void ReCalibration(void);
 static unsigned char RecallCalibrationFromMemory(void);
 static unsigned char ResetCalibrationInMemory(void);
 static unsigned char SaveCalibrationToMemory(void);
-static void vSensorDataUpdateTimerCallback( TimerHandle_t pxTimer );
 static void compute_quaternions(void);
 
 
@@ -42,7 +41,6 @@ void sensor_management_task_handle(void *pvParameters)
 {   
 	SENSOR_MSG_T			sensorManageQueueMsgValue;
 	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为 100ms */
-	TimerHandle_t			xSensorDataUpdateTimer = NULL;      //用于控制sensor数据更新频率（更新至App）
 	
 	/* creat event queue for sensor management */
 	sensorManageEventQueue = xQueueCreate(SENSOR_EVENT_QUEUE_SIZE,sizeof(SENSOR_MSG_T));
@@ -74,11 +72,6 @@ void sensor_management_task_handle(void *pvParameters)
 
 	/* creat a timer for sensor data update control */
 	bsp_sensor_management_timer_init();
-	xSensorDataUpdateTimer = xTimerCreate("MEMSTim",SENSOR_DATA_UPDATE_TIMER_FREQ,pdTRUE,(void *)1,vSensorDataUpdateTimerCallback);
-	if(xSensorDataUpdateTimer != NULL)
-	{
-		xTimerStart(xSensorDataUpdateTimer,xMaxBlockTime);
-	}
 		
     while(1)
     {
@@ -131,22 +124,23 @@ void sensor_management_task_handle(void *pvParameters)
 
 /**
   * @brief  call back for control the sensor data update frequence
+  * @note   This is a interrupt handler,the frequence @mmsc{@ref SENSOR_DATA_UPDATE_TIMER_FREQ}
   * @param  TimerHandle_t pxTimer
   * @retval None
   */
-static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
+void vSensorDataUpdateTimerCallback(void)
 {
 	SENSOR_MSG_T			sensorManageQueueMsgValue;
-	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(10); /* 设置最大等待时间为 10ms */
-	uint16_t				envDataCntCtl = (1000 / ENVIRONMENTAL_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
-	uint16_t				motionDataCntCtl = (1000 / MOTION_DATA_UPDATE_FREQ) * SENSOR_DATA_UPDATE_TIMER_FREQ;
-//	uint16_t				motionDataFusionCntCtl = (1000/MOTION_DATA_FUSION_FREQ*SENSOR_DATA_UPDATE_TIMER_FREQ);
+    BaseType_t              xHigherPriorityTaskWoken = pdFALSE;
+    BaseType_t              xHigherPriorityTaskWokenRecord = pdFALSE;
+	uint16_t				envDataCntCtl = SENSOR_DATA_UPDATE_TIMER_FREQ / ENVIRONMENTAL_DATA_UPDATE_FREQ;
+	uint16_t				motionDataCntCtl = SENSOR_DATA_UPDATE_TIMER_FREQ / MOTION_DATA_UPDATE_FREQ;
+//	uint16_t				motionDataFusionCntCtl = (SENSOR_DATA_UPDATE_TIMER_FREQ / MOTION_DATA_FUSION_FREQ);
 	uint16_t				motionDataFusionCntCtl = 10;
 	static uint16_t			envDataCnt = 0;		//环境传感器数据上传频率计数
 	static uint16_t			motionDataCnt = 0;	//运动原始数据上传频率计数	
 	static uint16_t			motionDataFusionCnt = 0; //运动数据融合频率计数
 	
-	pxTimer = pxTimer;
 	sensorManageQueueMsgValue.eventID = EVENT_SENSOR_DEFAULT;
 	
 	if(gDevInfo.bleStatus == CONNECT)
@@ -162,7 +156,11 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 			if(W2ST_CHECK_CONNECTION(W2ST_CONNECT_ENV))
 			{
 				sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ENVIRONMENT_DATA_UPDATE;
-				xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
+				xQueueSendFromISR(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,&xHigherPriorityTaskWoken);
+                if(xHigherPriorityTaskWokenRecord != pdTRUE)
+                {
+                    xHigherPriorityTaskWokenRecord = xHigherPriorityTaskWoken;
+                }
 			}
 		}
 		
@@ -170,7 +168,11 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 		{
 			motionDataCnt = 0;
 			sensorManageQueueMsgValue.eventID = EVENT_SENSOR_MOTION_DATA_UPDATA;
-//			xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);		
+			xQueueSendFromISR(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,&xHigherPriorityTaskWoken);
+            if(xHigherPriorityTaskWokenRecord != pdTRUE)
+            {
+                xHigherPriorityTaskWokenRecord = xHigherPriorityTaskWoken;
+            }            
 		}
 		
 		if(motionDataFusionCnt >= motionDataFusionCntCtl)// motion data fusion
@@ -179,9 +181,17 @@ static void vSensorDataUpdateTimerCallback(TimerHandle_t pxTimer)
 			if(W2ST_CHECK_CONNECTION(W2ST_CONNECT_QUAT))
 			{
 				sensorManageQueueMsgValue.eventID = EVENT_SNESOR_MOTION_DATA_FUSION;
-				xQueueSend(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,xMaxBlockTime);
+				xQueueSendFromISR(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,&xHigherPriorityTaskWoken);
+                if(xHigherPriorityTaskWokenRecord != pdTRUE)
+                {
+                    xHigherPriorityTaskWokenRecord = xHigherPriorityTaskWoken;
+                }                
 			}				
 		}
+        if(pdTRUE == xHigherPriorityTaskWokenRecord)
+        {
+            taskYIELD ();
+        }
 	}
 }
 
@@ -414,43 +424,43 @@ static void compute_quaternions(void)
 	MotionFX_manager_run(ACC_Value_Raw,GYR_Value,MAG_Value);
 
 	/* Check if is calibrated */
-//	if(isCal!=true)
-//	{
-//		/* Run Compass Calibration @ 25Hz */
-//		calibIndex++;
-//		if (calibIndex == 4)
-//		{
-//			calibIndex = 0;
-//			ACC_Value.AXIS_X = (int32_t)(ACC_Value_Raw.AXIS_X * sensitivity);
-//			ACC_Value.AXIS_Y = (int32_t)(ACC_Value_Raw.AXIS_Y * sensitivity);
-//			ACC_Value.AXIS_Z = (int32_t)(ACC_Value_Raw.AXIS_Z * sensitivity);
-//			osx_MotionFX_compass_saveAcc(ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);	/* Accelerometer data ENU systems coordinate	*/
-//			osx_MotionFX_compass_saveMag(MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);	/* Magnetometer  data ENU systems coordinate	*/            
-//			osx_MotionFX_compass_run();
+	if(isCal!=true)
+	{
+		/* Run Compass Calibration @ 25Hz */
+		calibIndex++;
+		if (calibIndex == 4)
+		{
+			calibIndex = 0;
+			ACC_Value.AXIS_X = (int32_t)(ACC_Value_Raw.AXIS_X * sensitivity);
+			ACC_Value.AXIS_Y = (int32_t)(ACC_Value_Raw.AXIS_Y * sensitivity);
+			ACC_Value.AXIS_Z = (int32_t)(ACC_Value_Raw.AXIS_Z * sensitivity);
+			osx_MotionFX_compass_saveAcc(ACC_Value.AXIS_X,ACC_Value.AXIS_Y,ACC_Value.AXIS_Z);	/* Accelerometer data ENU systems coordinate	*/
+			osx_MotionFX_compass_saveMag(MAG_Value.AXIS_X,MAG_Value.AXIS_Y,MAG_Value.AXIS_Z);	/* Magnetometer  data ENU systems coordinate	*/            
+			osx_MotionFX_compass_run();
 
-//			/* Control the calibration status */
-//			isCal = osx_MotionFX_compass_isCalibrated();
-//			if(isCal == true)
-//			{
-//				#ifdef DEBUG_SENSOR_MANAGEMENT
-//					printf("Compass Calibrated\n\r");
-//				#endif				
+			/* Control the calibration status */
+			isCal = osx_MotionFX_compass_isCalibrated();
+			if(isCal == true)
+			{
+				#ifdef DEBUG_SENSOR_MANAGEMENT
+					printf("Compass Calibrated\n\r");
+				#endif				
 
-//				/* Get new magnetometer offset */
-//				osx_MotionFX_getCalibrationData(&magOffset);
+				/* Get new magnetometer offset */
+				osx_MotionFX_getCalibrationData(&magOffset);
 
-//				/* Save the calibration in Memory */
-//				SaveCalibrationToMemory();
+				/* Save the calibration in Memory */
+				SaveCalibrationToMemory();
 
-//				/* Notifications of Compass Calibration */
-//				Calib_Notify(FEATURE_MASK_SENSORFUSION_SHORT,W2ST_COMMAND_CAL_STATUS,isCal);
-//			}
-//		}
-//	}
-//	else 
-//	{
-//		calibIndex=0;
-//	}
+				/* Notifications of Compass Calibration */
+				Calib_Notify(FEATURE_MASK_SENSORFUSION_SHORT,W2ST_COMMAND_CAL_STATUS,isCal);
+			}
+		}
+	}
+	else 
+	{
+		calibIndex=0;
+	}
 
 	/* Read the quaternions */
 	osxMFX_output *MotionFX_Engine_Out = MotionFX_manager_getDataOUT();
