@@ -135,8 +135,7 @@ void vSensorDataUpdateTimerCallback(void)
     BaseType_t              xHigherPriorityTaskWokenRecord = pdFALSE;
 	uint16_t				envDataCntCtl = SENSOR_DATA_UPDATE_TIMER_FREQ / ENVIRONMENTAL_DATA_UPDATE_FREQ;
 	uint16_t				motionDataCntCtl = SENSOR_DATA_UPDATE_TIMER_FREQ / MOTION_DATA_UPDATE_FREQ;
-//	uint16_t				motionDataFusionCntCtl = (SENSOR_DATA_UPDATE_TIMER_FREQ / MOTION_DATA_FUSION_FREQ);
-	uint16_t				motionDataFusionCntCtl = 10;
+	uint16_t				motionDataFusionCntCtl = (SENSOR_DATA_UPDATE_TIMER_FREQ / MOTION_DATA_FUSION_FREQ);
 	static uint16_t			envDataCnt = 0;		//环境传感器数据上传频率计数
 	static uint16_t			motionDataCnt = 0;	//运动原始数据上传频率计数	
 	static uint16_t			motionDataFusionCnt = 0; //运动数据融合频率计数
@@ -407,8 +406,8 @@ static void compute_quaternions(void)
 	SensorAxes_t 					GYR_Value;
 	SensorAxes_t 					MAG_Value;
 
-	uint32_t	time = 0;
-	time = HAL_GetTick();
+//	uint32_t	time = 0;
+//	time = HAL_GetTick();
 	/* Incremente the Counter */
 	CounterFX++;
 
@@ -491,7 +490,7 @@ static void compute_quaternions(void)
 		Quat_Update(quat_axes);
 		CounterFX=0;
 	}
-	printf("time:%d,%d\r\n",HAL_GetTick(),(HAL_GetTick()-time));
+//	printf("time:%d,%d\r\n",HAL_GetTick(),(HAL_GetTick()-time));
 }
 
 

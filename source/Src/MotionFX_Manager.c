@@ -94,15 +94,15 @@ void MotionFX_manager_run( SensorAxesRaw_t ACC_Value_Raw,SensorAxes_t GYR_Value,
   iDataIN.mag[1] = (MAG_Value.AXIS_Y - magOffset.magOffY) * FROM_MGAUSS_TO_UT50;
   iDataIN.mag[2] = (MAG_Value.AXIS_Z - magOffset.magOffZ) * FROM_MGAUSS_TO_UT50;
 
-//  if(discardedCount == SAMPLETODISCARD)
+  if(discardedCount == SAMPLETODISCARD)
   {
     osx_MotionFX_propagate(&iDataOUT, &iDataIN, DELTATIMESENSORFUSION);
     osx_MotionFX_update(&iDataOUT, &iDataIN, DELTATIMESENSORFUSION, NULL);
   } 
-//  else 
-//  {
-//    discardedCount++;
-//  }  
+  else 
+  {
+    discardedCount++;
+  }  
 }
 
 /**
