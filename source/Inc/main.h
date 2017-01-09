@@ -66,6 +66,7 @@
 #include "MotionFX_Manager.h"
 #include "cmu_protocol.h"
 #include "bsp_timer.h"
+#include "bsp_hwAdvanceFeatures.h"
 
 
 

@@ -53,6 +53,7 @@
 #define DEBUG_OSXMOTIONFX
 #define DEBUG_APP_CONTROL			//App控制命令调试
 #define DEBUG_SENSOR_MANAGEMENT		//
+#define DEBUG_HW_ADVANCE_FEATURE    //硬件高级功能调试开关
 
 
 /* Package Version only numbers 0->9 */

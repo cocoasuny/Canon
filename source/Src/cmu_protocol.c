@@ -104,14 +104,14 @@ void cmu_config_command_parsing(uint8_t * att_data, uint8_t data_length)
 					{
 						case 1:
 						{
-//							EnableHWFreeFall();
-//							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
+							enable_hw_double_tap();
+							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
 						}
 						break;
 						case 0:
 						{
-//							DisableHWFreeFall();
-//							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
+							disable_hw_double_tap();
+							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
 						}
 						break;
 					}
