@@ -41,6 +41,7 @@
 #include "gp_timer.h"
 #include "hci.h"
 #include "platform.h"
+#include "main.h"
 
 
 #define HEADER_SIZE 5
@@ -60,7 +61,22 @@ SPI_HandleTypeDef SpiHandle;
  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-  HCI_Isr();
+	SENSOR_MSG_T			sensorManageQueueMsgValue;
+    BaseType_t              xHigherPriorityTaskWoken = pdFALSE;
+	
+	if(GPIO_Pin == BNRG_SPI_EXTI_PIN)
+	{
+		HCI_Isr();
+	}
+	else if(GPIO_Pin == MEMS_INT1_PIN)
+	{
+		sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ACC_DOUBLE_TAP;
+		xQueueSendFromISR(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,&xHigherPriorityTaskWoken);
+  		if(pdTRUE == xHigherPriorityTaskWoken)
+        {
+            taskYIELD ();
+        }
+	}
 }
 
 

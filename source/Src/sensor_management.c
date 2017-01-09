@@ -41,6 +41,7 @@ void sensor_management_task_handle(void *pvParameters)
 {   
 	SENSOR_MSG_T			sensorManageQueueMsgValue;
 	const TickType_t 		xMaxBlockTime = pdMS_TO_TICKS(100); /* 设置最大等待时间为 100ms */
+	uint8_t 				stat = 0;
 	
 	/* creat event queue for sensor management */
 	sensorManageEventQueue = xQueueCreate(SENSOR_EVENT_QUEUE_SIZE,sizeof(SENSOR_MSG_T));
@@ -113,6 +114,26 @@ void sensor_management_task_handle(void *pvParameters)
 						compute_quaternions();
 					}
 					break;
+					case EVENT_SENSOR_ACC_DOUBLE_TAP:
+					{
+						#ifdef DEBUG_SENSOR_MANAGEMENT
+							printf("double tap\r\n");
+						#endif
+						/* Check if the interrupt is due to Double Tap */
+//						BSP_ACCELERO_Get_Double_Tap_Detection_Status_Ext(gMEMSHandler.HandleAccSensor,&stat);
+						if(stat) 
+						{
+//							AccEvent_Notify(ACC_DOUBLE_TAP);
+						}
+					}
+					break;
+					case EVENT_SENSOR_ACC_SINGLE_TAP:
+					{
+						#ifdef DEBUG_SENSOR_MANAGEMENT
+							printf("single tap\r\n");
+						#endif							
+					}
+					break;					
 					default:break;
 				}
 			}

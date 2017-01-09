@@ -208,4 +208,9 @@ void SENSOR_MANAGEMENT_TIM_IRQHandler(void)
 	HAL_TIM_IRQHandler(&gSensorManagementTimHandle);
 }
 
+void MEMS_INT1_IRQHandler(void)
+{
+	HAL_GPIO_EXTI_IRQHandler(MEMS_INT1_PIN);
+}
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

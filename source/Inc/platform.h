@@ -240,8 +240,8 @@
 #define MEMS_INT1_GPIO_CLK_ENABLE()   __GPIOC_CLK_ENABLE()
 #define MEMS_INT1_GPIO_CLK_DISABLE()  __GPIOC_CLK_DISABLE()
 #define MEMS_INT1_PIN                 GPIO_PIN_0
-
 #define MEMS_INT1_EXTI_IRQn           EXTI0_IRQn
+#define	MEMS_INT1_IRQHandler		  EXTI0_IRQHandler
 
 
 #endif /* __PLATFORM_H_ */
