@@ -144,14 +144,14 @@ void cmu_config_command_parsing(uint8_t * att_data, uint8_t data_length)
 					{
 						case 1:
 						{
-//							EnableHWSingleTap();
-//							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
+							enable_hw_single_tap();
+							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
 						}
 						break;
 						case 0:
 						{
-//							DisableHWSingleTap();
-//							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
+							disable_hw_single_tap();
+							Config_Notify(FEATURE_MASK_ACC_EVENTS,Command,Data);
 						}
 						break;
 					}

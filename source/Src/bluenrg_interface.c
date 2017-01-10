@@ -70,7 +70,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 	else if(GPIO_Pin == MEMS_INT1_PIN)
 	{
-		sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ACC_DOUBLE_TAP;
+		sensorManageQueueMsgValue.eventID = EVENT_SENSOR_ACC_GRY_INTERRUPT;
 		xQueueSendFromISR(sensorManageEventQueue,(void *)&sensorManageQueueMsgValue,&xHigherPriorityTaskWoken);
   		if(pdTRUE == xHigherPriorityTaskWoken)
         {

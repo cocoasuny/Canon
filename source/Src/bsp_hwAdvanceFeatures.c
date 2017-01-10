@@ -76,6 +76,53 @@ void disable_hw_double_tap(void)
     BSP_ACCELERO_Set_ODR_Value(gMEMSHandler.HandleAccSensor,DefaultAccODR);
 }
 
+/**
+  * @brief  This function enables the HW's Single Tap Detection
+  * @param  None
+  * @retval None
+  */
+void enable_hw_single_tap(void)
+{
+    /* Disable all the HW features before */
+//    DisableHWFeatures();
 
+    /* Enable Single Tap detection */
+    if(BSP_ACCELERO_Enable_Single_Tap_Detection_Ext(gMEMSHandler.HandleAccSensor)==COMPONENT_ERROR)
+    {
+        #ifdef DEBUG_HW_ADVANCE_FEATURE
+            printf("Error Enabling Single Tap Detection\r\n");
+        #endif
+    } 
+    #ifdef DEBUG_HW_ADVANCE_FEATURE
+    else 
+    {
+        printf("Enabled Sigle Tap\r\n");
+    }
+    #endif
+}
+/**
+  * @brief  This function disables the HW's Single Tap Detection
+  * @param  None
+  * @retval None
+  */
+void disable_hw_single_tap(void)
+{
+    /* Disable Single Tap detection */
+    if(BSP_ACCELERO_Disable_Single_Tap_Detection_Ext(gMEMSHandler.HandleAccSensor)==COMPONENT_ERROR)
+    {
+        #ifdef DEBUG_HW_ADVANCE_FEATURE
+            printf("Error Disabling Single Tap Detection\r\n");
+        #endif
+    }
+    #ifdef DEBUG_HW_ADVANCE_FEATURE
+    else
+    {
+        printf("Disabled Sigle Tap\r\n");
+    }
+    #endif
+
+    /* Set the Output Data Rate to Default value */
+    BSP_ACCELERO_Set_ODR_Value(gMEMSHandler.HandleAccSensor,DefaultAccODR);
+}
 
 

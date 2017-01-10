@@ -807,7 +807,7 @@ void LSM6DS3_IO_ITConfig( void )
     HAL_GPIO_Init(MEMS_INT1_GPIO_PORT, &GPIO_InitStructureInt1);
 
     /* Enable and set EXTI Interrupt priority */
-    HAL_NVIC_SetPriority(MEMS_INT1_EXTI_IRQn, 0x00, 0x00);
+    HAL_NVIC_SetPriority(MEMS_INT1_EXTI_IRQn, 0x05, 0x00);
     HAL_NVIC_EnableIRQ(MEMS_INT1_EXTI_IRQn);
 }
 
